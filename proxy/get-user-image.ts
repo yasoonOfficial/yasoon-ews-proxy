@@ -5,7 +5,7 @@ import { GetUserPhotoRequest } from 'extensions/GetUserPhotoRequest';
 
 export class GetUserImageRequest {
 
-    async execute(env: Environment, params: { email: string }, payload: any) {
+    async execute(env: Environment, params: { email: string }) {
         let service = new ExchangeService();
         service.Url = new Uri(env.ewsUrl);
         applyCredentials(service, env);

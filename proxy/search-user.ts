@@ -5,7 +5,7 @@ import { Environment } from 'model/proxy';
 
 export class SearchUserRequest {
 
-    async execute(env: Environment, params: { searchTerm: string }, payload: any) {
+    async execute(env: Environment, params: { searchTerm: string }) {
         let service = new ExchangeService();
         service.Url = new Uri(env.ewsUrl);
         applyCredentials(service, env);

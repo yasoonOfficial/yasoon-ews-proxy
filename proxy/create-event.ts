@@ -1,17 +1,21 @@
 import { Environment } from "model/proxy";
-import { ExchangeService, Uri, FolderId, WellKnownFolderName, Mailbox, Appointment, ExchangeVersion, TimeZoneInfo, SendInvitationsMode } from "ews-javascript-api";
+import {
+    ExchangeService, Uri, FolderId, WellKnownFolderName,
+    Mailbox, Appointment, ExchangeVersion, TimeZoneInfo,
+    SendInvitationsMode
+} from "ews-javascript-api";
 import { applyCredentials } from "proxy/helper";
 import { copyApiEventToAppointment } from 'proxy/mapper';
 import { OfficeApiEvent } from 'model/office';
 
-export interface CreateUserCalendarEventParams {
+export interface CreateEventParams {
     email: string;
     calendarId: string;
 }
 
-export class CreateUserCalendarEventRequest {
+export class CreateEventRequest {
 
-    async execute(env: Environment, params: CreateUserCalendarEventParams, payload: OfficeApiEvent) {
+    async execute(env: Environment, params: CreateEventParams, payload: OfficeApiEvent) {
         let service = new ExchangeService(ExchangeVersion.Exchange2013, TimeZoneInfo.Utc);
         service.Url = new Uri(env.ewsUrl);
         applyCredentials(service, env);

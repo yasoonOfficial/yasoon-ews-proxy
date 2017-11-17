@@ -5,16 +5,16 @@ import { ExchangeService, Uri, FolderId, WellKnownFolderName, Mailbox, BasePrope
 import { applyCredentials } from "proxy/helper";
 import { mapAppointmentToApiEvent } from 'proxy/mapper';
 
-export interface GetUserCalendarEventsParams {
+export interface GetEventsParams {
     email: string;
     calendarId: string;
     startDate: string;
     endDate: string;
 }
 
-export class GetUserCalendarEventsRequest {
+export class GetEventsRequest {
 
-    async execute(env: Environment, params: GetUserCalendarEventsParams, payload: any) {
+    async execute(env: Environment, params: GetEventsParams) {
         let service = new ExchangeService(ExchangeVersion.Exchange2013, TimeZoneInfo.Utc);
         service.Url = new Uri(env.ewsUrl);
         applyCredentials(service, env);

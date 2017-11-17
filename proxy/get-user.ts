@@ -5,7 +5,7 @@ import { FindPeopleRequest } from 'extensions/FindPeopleRequest';
 
 export class GetUserRequest {
 
-    async execute(env: Environment, params: { email: string }, payload: any) {
+    async execute(env: Environment, params: { email: string }) {
         let service = new ExchangeService();
         service.Url = new Uri(env.ewsUrl);
         applyCredentials(service, env);

@@ -36,9 +36,11 @@ import { EWS_AUTH_TYPE_HEADER, EWS_TOKEN_HEADER, EWS_URL_HEADER, EWS_URL_OFFICE_
 import { getEnvFromHeader } from 'proxy/helper';
 import { GetUserRequest } from 'proxy/get-user';
 import { GetUserImageRequest } from 'proxy/get-user-image';
-import { GetUserCalendarRequest } from 'proxy/get-user-calendars';
-import { GetUserCalendarEventsRequest } from 'proxy/get-user-calendar-events';
-import { CreateUserCalendarEventRequest } from 'proxy/create-user-calendar-event';
+import { GetCalendarsRequest } from 'proxy/get-calendars';
+import { GetEventsRequest } from 'proxy/get-events';
+import { CreateEventRequest } from 'proxy/create-event';
+import { UpdateEventRequest } from 'proxy/update-event';
+import { GetFreeBusyEventsRequest } from 'proxy/get-free-busy-events';
 
 const customHeaders = [
     EWS_AUTH_TYPE_HEADER,
@@ -159,44 +161,44 @@ app.get('/user/:email/publicFolderMailbox', tryWrapper(async (req: express.Reque
 
 app.get('/user/search', tryWrapper(async (req: express.Request, res: express.Response) => {
     let searchUser = new SearchUserRequest();
-    let result = await searchUser.execute(getEnvFromHeader(req), req.query, null);
+    let result = await searchUser.execute(getEnvFromHeader(req), req.query);
     res.send(result);
 }));
 
 app.get('/user/:email', tryWrapper(async (req: express.Request, res: express.Response) => {
     let getUser = new GetUserRequest();
-    let result = await getUser.execute(getEnvFromHeader(req), req.query, null);
+    let result = await getUser.execute(getEnvFromHeader(req), req.query);
     res.send(result);
 }));
 
 app.get('/user/:email/photo', tryWrapper(async (req: express.Request, res: express.Response) => {
     let getUserImage = new GetUserImageRequest();
-    let result = await getUserImage.execute(getEnvFromHeader(req), req.query, null);
+    let result = await getUserImage.execute(getEnvFromHeader(req), req.query);
 
     res.set('Content-Type', result.mimeType);
     res.send(result.content);
 }));
 
 app.get('/user/:email/calendars', async (req: express.Request, res: express.Response) => {
-    let getUserCalendar = new GetUserCalendarRequest();
-    let result = await getUserCalendar.execute(getEnvFromHeader(req), req.query, null);
+    let getUserCalendar = new GetCalendarsRequest();
+    let result = await getUserCalendar.execute(getEnvFromHeader(req), req.query);
     res.send(result);
 });
 
 app.get('/user/:email/calendars/:id/events', async (req: express.Request, res: express.Response) => {
-    let getUserCalendarEvents = new GetUserCalendarEventsRequest();
+    let getUserCalendarEvents = new GetEventsRequest();
     let result = await getUserCalendarEvents.execute(getEnvFromHeader(req), {
         calendarId: req.params.id,
         email: req.params.email,
         startDate: req.query.startDate,
         endDate: req.query.endDate
-    }, null);
+    });
 
     res.send(result);
 });
 
 app.post('/user/:email/calendars/:id/events', tryWrapper(async (req: express.Request, res: express.Response) => {
-    let createEvent = new CreateUserCalendarEventRequest();
+    let createEvent = new CreateEventRequest();
     let result = await createEvent.execute(getEnvFromHeader(req), {
         calendarId: req.params.id,
         email: req.params.email
@@ -206,35 +208,13 @@ app.post('/user/:email/calendars/:id/events', tryWrapper(async (req: express.Req
 }));
 
 app.patch('/user/:email/calendars/:id/events/:eventId', tryWrapper(async (req: express.Request, res: express.Response) => {
-    let service = new ExchangeService(ExchangeVersion.Exchange2013, TimeZoneInfo.Utc);
-    service.Url = new Uri(req.headers[EWS_URL_HEADER] || EWS_URL_OFFICE_365);
-    applyCredentials(service, req, res);
+    let updateEvent = new UpdateEventRequest();
+    await updateEvent.execute(getEnvFromHeader(req), {
+        calendarId: req.params.id,
+        email: req.params.email,
+        eventId: req.params.eventId
+    }, req.body);
 
-    let userEmail = req.params.email;
-    let calendarId = req.params.id;
-    let eventId = req.params.eventId;
-    let targetFolderId: FolderId = null;
-    let rawEvent: OfficeApiEvent = req.body;
-
-    //Get folder instance
-    if (calendarId === 'main') {
-        targetFolderId = new FolderId(WellKnownFolderName.Calendar, new Mailbox(userEmail));
-    } else {
-        targetFolderId = new FolderId();
-        targetFolderId.UniqueId = calendarId;
-    }
-
-    let appointment = await Appointment.Bind(service, new ItemId(eventId));
-    copyApiEventToAppointment(rawEvent, appointment);
-
-    let mode: SendInvitationsOrCancellationsMode = SendInvitationsOrCancellationsMode.SendToNone;
-    if (rawEvent.attendees && Object.keys(rawEvent).length === 1) {
-        mode = SendInvitationsOrCancellationsMode.SendToChangedAndSaveCopy;
-    } else if (rawEvent.attendees && rawEvent.attendees.length > 0 && Object.keys(rawEvent).length > 1) {
-        mode = SendInvitationsOrCancellationsMode.SendToAllAndSaveCopy;
-    }
-
-    await appointment.Update(ConflictResolutionMode.AutoResolve, mode);
     res.send(200);
 }));
 
@@ -242,55 +222,14 @@ app.get('/user/:email/calendars/:id/free-busy', tryWrapper(async (req: express.R
     if (req.params.id !== 'main')
         return res.status(400).send();
 
-    let service = new ExchangeService(ExchangeVersion.Exchange2013, TimeZoneInfo.Utc);
-    service.Url = new Uri(req.headers[EWS_URL_HEADER] || EWS_URL_OFFICE_365);
-    applyCredentials(service, req, res);
+    let getUserCalendarEvents = new GetFreeBusyEventsRequest();
+    let result = await getUserCalendarEvents.execute(getEnvFromHeader(req), {
+        email: req.params.email,
+        startDate: req.query.startDate,
+        endDate: req.query.endDate
+    });
 
-    //We don't have full read access, check if we can get free busy data
-    let attendee = new AttendeeInfo(req.params.email);
-    let startDate = new DateTime(moment(req.query.startDate as string));
-    let endDate = new DateTime(moment(req.query.endDate as string));
-
-    //Request as much information as possible, subject and location may be set!
-    let options = new AvailabilityOptions();
-    options.RequestedFreeBusyView = FreeBusyViewType.DetailedMerged;
-
-    let availability = await service.GetUserAvailability([attendee], new TimeWindow(startDate, endDate), AvailabilityData.FreeBusy, options);
-    if (availability.AttendeesAvailability.Responses[0].Result === ServiceResult.Error) {
-        return res.status(500).send({ key: 'freeBusyCallFailed', error: availability.AttendeesAvailability.Responses[0].ErrorMessage })
-    }
-
-    let calendarEvents = availability.AttendeesAvailability.Responses[0].CalendarEvents;
-
-    res.send(calendarEvents.map(c => {
-        let id = 'freeBusy' + c.StartTime.ToISOString();
-        let location = '';
-        let subject = getFreeBusyStatusLabel(c.FreeBusyStatus);
-
-        if (c.Details) {
-            id = c.Details.StoreId || id;
-            location = c.Details.Location || location;
-            subject = c.Details.Subject || subject;
-        }
-
-        return <OfficeApiEvent>{
-            id: id,
-            calendarId: 'main',
-            start: {
-                dateTime: c.StartTime.ToISOString(),
-                timeZone: 'UTC'
-            },
-            end: {
-                dateTime: c.EndTime.ToISOString(),
-                timeZone: 'UTC'
-            },
-            subject: subject,
-            location: { displayName: location },
-            isAllDay: (c.EndTime.Subtract(c.StartTime).TotalHours >= 24),
-            showAs: getFreeBusyStatusNewName(c.FreeBusyStatus)
-        };
-    }));
-
+    res.send(result);
 }));
 
 app.get('/user/:email/calendars/:id/effective-permissions', tryWrapper(async (req: express.Request, res: express.Response) => {
