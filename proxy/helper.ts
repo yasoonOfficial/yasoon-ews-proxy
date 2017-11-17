@@ -31,4 +31,38 @@ export function getEnvFromHeader(req: express.Request): Environment {
         ewsUser: req.headers[EWS_USER_HEADER],
         ewsPassword: req.headers[EWS_PASSWORD_HEADER]
     };
-};
+}
+
+export function getAccessArrayFromEffectiveRights(effectiveRights: any) {
+    if (effectiveRights && Number.isInteger(effectiveRights)) {
+        //Todo!!!
+        throw new Error('not supported yet, todo!');
+        //Bug in ews-javascript-api, see https://github.com/gautamsi/ews-javascript-api/pull/214
+    } else if (effectiveRights && effectiveRights['__type'] === 'EffectiveRights') {
+        let rights: {
+            CreateAssociated: "true" | "false",
+            CreateContents: "true" | "false",
+            CreateHierarchy: "true" | "false",
+            Delete: "true" | "false",
+            Modify: "true" | "false",
+            Read: "true" | "false",
+            ViewPrivateItems: "true" | "false"
+        } = <any>effectiveRights;
+
+        let access = [];
+        if (rights.CreateContents === 'true')
+            access.push('create');
+        if (rights.CreateHierarchy === 'true')
+            access.push('createFolder');
+        if (rights.Delete === 'true')
+            access.push('delete');
+        if (rights.Modify === 'true')
+            access.push('edit');
+        if (rights.Read === 'true')
+            access.push('read');
+
+        return access;
+    } else {
+        return [];
+    }
+}

@@ -5,7 +5,3 @@ export interface Environment {
     ewsUser: string;
     ewsPassword: string;
 }
-
-export interface ProxyMethod {
-    execute(env: Environment, params: { [key: string]: string }, payload: any): Promise<any>;
-}

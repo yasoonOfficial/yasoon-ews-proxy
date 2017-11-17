@@ -7,7 +7,7 @@ import * as FormData from 'form-data';
 import * as moment from 'moment-timezone';
 import * as fs from 'fs';
 import * as poxAutodiscover from 'autodiscover';
-import * as xmlEscape from 'xml-escape';
+
 import { EnumValues } from 'enum-values';
 import { OfficeApiEvent, OfficeEventAttendee, EventAvailability } from './model/office';
 import { DownloadRequest } from './model/downloadRequest';
@@ -34,6 +34,11 @@ import { AutodiscoverService as NtlmAutodiscoverService } from './ews/CustomAuto
 import { SearchUserRequest } from 'proxy/search-user';
 import { EWS_AUTH_TYPE_HEADER, EWS_TOKEN_HEADER, EWS_URL_HEADER, EWS_URL_OFFICE_365, EWS_USER_HEADER, EWS_PASSWORD_HEADER } from 'model/constants';
 import { getEnvFromHeader } from 'proxy/helper';
+import { GetUserRequest } from 'proxy/get-user';
+import { GetUserImageRequest } from 'proxy/get-user-image';
+import { GetUserCalendarRequest } from 'proxy/get-user-calendars';
+import { GetUserCalendarEventsRequest } from 'proxy/get-user-calendar-events';
+import { CreateUserCalendarEventRequest } from 'proxy/create-user-calendar-event';
 
 const customHeaders = [
     EWS_AUTH_TYPE_HEADER,
@@ -159,161 +164,45 @@ app.get('/user/search', tryWrapper(async (req: express.Request, res: express.Res
 }));
 
 app.get('/user/:email', tryWrapper(async (req: express.Request, res: express.Response) => {
-    let service = new ExchangeService();
-    service.Url = new Uri(req.headers[EWS_URL_HEADER] || EWS_URL_OFFICE_365);
-    applyCredentials(service, req, res);
-
-    var request = new FindPeopleRequest(service, null);
-    request.QueryString = req.params.email;
-    request.View = new ItemView(100);
-    let response = await request.Execute();
-
-    //Special case for aliases
-    if (response.People.length === 1) {
-        res.send(response.People.map((p) => ({
-            id: p.PersonaId.Id,
-            displayName: p.DisplayName,
-            mail: p.EmailAddress.EmailAddress,
-            givenName: p.GivenName,
-            surname: p.Surname
-        }))[0]);
-    } else {
-        res.send(response.People.filter(p => p.PersonaType === 'Person' && p.EmailAddress.EmailAddress === req.params.email).map((p) => ({
-            id: p.PersonaId.Id,
-            displayName: p.DisplayName,
-            mail: p.EmailAddress.EmailAddress,
-            givenName: p.GivenName,
-            surname: p.Surname
-        }))[0]);
-    }
+    let getUser = new GetUserRequest();
+    let result = await getUser.execute(getEnvFromHeader(req), req.query, null);
+    res.send(result);
 }));
 
 app.get('/user/:email/photo', tryWrapper(async (req: express.Request, res: express.Response) => {
-    let service = new ExchangeService();
-    service.Url = new Uri(req.headers[EWS_URL_HEADER] || EWS_URL_OFFICE_365);
-    applyCredentials(service, req, res);
+    let getUserImage = new GetUserImageRequest();
+    let result = await getUserImage.execute(getEnvFromHeader(req), req.query, null);
 
-    var request = new GetUserPhotoRequest(service, null);
-    request.EmailAddress = req.params.email;
-    request.Size = 360;
-
-    let response = await request.Execute();
-    res.set('Content-Type', response.PictureData.ContentType);
-    res.send(new Buffer(response.PictureData.PictureData, 'base64'));
+    res.set('Content-Type', result.mimeType);
+    res.send(result.content);
 }));
 
 app.get('/user/:email/calendars', async (req: express.Request, res: express.Response) => {
-    let service = new ExchangeService(ExchangeVersion.Exchange2013);
-    service.Url = new Uri(req.headers[EWS_URL_HEADER] || EWS_URL_OFFICE_365);
-    applyCredentials(service, req, res);
-
-    let sharedCalendar = new FolderId(WellKnownFolderName.Calendar, new Mailbox(req.params.email));
-    let folderView = new FolderView(1000);
-    folderView.PropertySet = new PropertySet(BasePropertySet.IdOnly, FolderSchema.DisplayName, FolderSchema.EffectiveRights);
-    try {
-        let ewsResult = await service.FindFolders(sharedCalendar, folderView);
-        res.send(ewsResult.Folders.map(f => ({
-            id: f.Id.UniqueId,
-            name: f.DisplayName,
-            access: getAccessArrayFromEffectiveRights(f.EffectiveRights)
-        })));
-    }
-    catch (e) {
-        res.send([]);
-        console.log(e.message, e.toString(), e.stack);
-        //res.status(500).send({ key: 'retrieveCalendarsFailed', error: e.message });
-    }
+    let getUserCalendar = new GetUserCalendarRequest();
+    let result = await getUserCalendar.execute(getEnvFromHeader(req), req.query, null);
+    res.send(result);
 });
 
 app.get('/user/:email/calendars/:id/events', async (req: express.Request, res: express.Response) => {
-    let service = new ExchangeService(ExchangeVersion.Exchange2013, TimeZoneInfo.Utc);
-    service.Url = new Uri(req.headers[EWS_URL_HEADER] || EWS_URL_OFFICE_365);
-    applyCredentials(service, req, res);
+    let getUserCalendarEvents = new GetUserCalendarEventsRequest();
+    let result = await getUserCalendarEvents.execute(getEnvFromHeader(req), {
+        calendarId: req.params.id,
+        email: req.params.email,
+        startDate: req.query.startDate,
+        endDate: req.query.endDate
+    }, null);
 
-    let userEmail = req.params.email;
-    let calendarId = req.params.id;
-    let start = new DateTime(moment(req.query.startDate as string));
-    let end = new DateTime(moment(req.query.endDate as string));
-    let ewsFolder: FolderId = null;
-
-    if (calendarId === 'main') {
-        ewsFolder = new FolderId(WellKnownFolderName.Calendar, new Mailbox(userEmail));
-    } else {
-        ewsFolder = new FolderId();
-        ewsFolder.UniqueId = calendarId;
-    }
-
-    let calendarView = new CalendarView(start, end);
-    calendarView.MaxItemsReturned = 250;
-    calendarView.PropertySet = new PropertySet(
-        BasePropertySet.IdOnly,
-        AppointmentSchema.Sensitivity,
-        AppointmentSchema.Start,
-        AppointmentSchema.End,
-        AppointmentSchema.IsAllDayEvent,
-        AppointmentSchema.LegacyFreeBusyStatus
-    );
-
-    try {
-        let ewsResult = await service.FindAppointments(ewsFolder, calendarView);
-        let itemResponse = await service.BindToItems(ewsResult.Items.map(i => i.Id), PropertySet.FirstClassProperties);
-
-        let responseArray = [];
-        let privateItems = [];
-        for (let i = 0; i < itemResponse.Responses.length; i++) {
-            let item: Appointment = <Appointment>itemResponse.Responses[i].Item;
-
-            //Might be private.. Check in ewsResult
-            if (!item) {
-                //@ts-ignore
-                if (ewsResult.Items[i] && ewsResult.Items[i].Sensitivity !== "Normal") {
-                    responseArray.push(mapAppointmentToApiEvent(ewsResult.Items[i]));
-                }
-            } else {
-                responseArray.push(mapAppointmentToApiEvent(item));
-            }
-        }
-
-        res.send(responseArray);
-    }
-    catch (e) {
-        res.send([]);
-        //res.status(500).send({ key: 'retrieveCalendarsFailed', error: e.message });
-    }
+    res.send(result);
 });
 
 app.post('/user/:email/calendars/:id/events', tryWrapper(async (req: express.Request, res: express.Response) => {
-    //Basic checks, appointments need at least subject, start date & end date
-    let rawEvent: OfficeApiEvent = req.body;
-    if (!rawEvent.subject || !rawEvent.start || !rawEvent.end)
-        return res.status(400).send();
+    let createEvent = new CreateUserCalendarEventRequest();
+    let result = await createEvent.execute(getEnvFromHeader(req), {
+        calendarId: req.params.id,
+        email: req.params.email
+    }, req.body);
 
-    let service = new ExchangeService(ExchangeVersion.Exchange2013, TimeZoneInfo.Utc);
-    service.Url = new Uri(req.headers[EWS_URL_HEADER] || EWS_URL_OFFICE_365);
-    applyCredentials(service, req, res);
-
-    let userEmail = req.params.email;
-    let calendarId = req.params.id;
-    let targetFolderId: FolderId = null;
-    let mode: SendInvitationsMode = SendInvitationsMode.SendToNone;
-
-    if (rawEvent.attendees && rawEvent.attendees.length > 0) {
-        mode = SendInvitationsMode.SendToAllAndSaveCopy;
-    }
-
-    //Get folder instance
-    if (calendarId === 'main') {
-        targetFolderId = new FolderId(WellKnownFolderName.Calendar, new Mailbox(userEmail));
-    } else {
-        targetFolderId = new FolderId();
-        targetFolderId.UniqueId = calendarId;
-    }
-
-    let appointment = new Appointment(service);
-    copyApiEventToAppointment(rawEvent, appointment);
-
-    await appointment.Save(targetFolderId, mode);
-    res.send({ id: appointment.Id.UniqueId });
+    res.send(result);
 }));
 
 app.patch('/user/:email/calendars/:id/events/:eventId', tryWrapper(async (req: express.Request, res: express.Response) => {
@@ -763,39 +652,6 @@ app.get('/', (req, res) => {
     res.status(200).send('You have been served. Nothing to see, please move on. <br/>The Job (⌐■_■)');
 });
 
-function getAccessArrayFromEffectiveRights(effectiveRights: any) {
-    if (effectiveRights && Number.isInteger(effectiveRights)) {
-        //Todo!!!
-        throw new Exception('not supported yet, todo!');
-        //Bug in ews-javascript-api, see https://github.com/gautamsi/ews-javascript-api/pull/214
-    } else if (effectiveRights && effectiveRights['__type'] === 'EffectiveRights') {
-        let rights: {
-            CreateAssociated: "true" | "false",
-            CreateContents: "true" | "false",
-            CreateHierarchy: "true" | "false",
-            Delete: "true" | "false",
-            Modify: "true" | "false",
-            Read: "true" | "false",
-            ViewPrivateItems: "true" | "false"
-        } = <any>effectiveRights;
-
-        let access = [];
-        if (rights.CreateContents === 'true')
-            access.push('create');
-        if (rights.CreateHierarchy === 'true')
-            access.push('createFolder');
-        if (rights.Delete === 'true')
-            access.push('delete');
-        if (rights.Modify === 'true')
-            access.push('edit');
-        if (rights.Read === 'true')
-            access.push('read');
-
-        return access;
-    } else {
-        return [];
-    }
-}
 
 function tryWrapper(func: (req: express.Request, res: express.Response) => Promise<any>): (req: express.Request, res: express.Response) => void {
     return (async (req: express.Request, res: express.Response) => {
@@ -822,142 +678,6 @@ function tryWrapper(func: (req: express.Request, res: express.Response) => Promi
     });
 }
 
-function copyApiEventToAppointment(rawEvent: OfficeApiEvent, appointment: Appointment) {
-    //Let the mapping begin!
-    if (rawEvent.attendees) {
-        rawEvent.attendees.forEach(a => {
-            if (!a.type || a.type === 'Required') {
-                appointment.RequiredAttendees.Add(a.emailAddress.address);
-            } else if (a.type === 'Optional') {
-                appointment.OptionalAttendees.Add(a.emailAddress.address);
-            } else if (a.type === 'Resource') {
-                appointment.Resources.Add(a.emailAddress.address);
-            }
-        });
-    }
-
-    if (rawEvent.body) {
-        let bodyType = BodyType.Text;
-        if (rawEvent.body.contentType.toLowerCase() === 'html')
-            bodyType = BodyType.HTML;
-
-        //#shitty api
-        if (bodyType === BodyType.HTML)
-            rawEvent.body.content = xmlEscape(rawEvent.body.content);
-
-        appointment.Body = new MessageBody(bodyType, rawEvent.body.content);
-    }
-
-    if (rawEvent.showAs) {
-        //@ts-ignore
-        appointment.LegacyFreeBusyStatus = EnumValues.getNameFromValue(LegacyFreeBusyStatus, getLegacyFreeBusyStatusFromName(rawEvent.showAs));
-    }
-
-    if (rawEvent.categories) {
-        appointment.Categories = new StringList(rawEvent.categories || []);
-    }
-
-    if (rawEvent.location) {
-        appointment.Location = rawEvent.location ? rawEvent.location.displayName : '';
-    }
-
-    if (rawEvent.subject) {
-        appointment.Subject = rawEvent.subject;
-    }
-
-    if (rawEvent.isAllDay !== undefined) {
-        appointment.IsAllDayEvent = rawEvent.isAllDay;
-    }
-
-    if (rawEvent.isReminderOn === true) {
-        appointment.IsReminderSet = true;
-        appointment.ReminderMinutesBeforeStart = rawEvent.reminderMinutesBeforeStart;
-    } else if (rawEvent.isReminderOn === false) {
-        appointment.IsReminderSet = false;
-    }
-
-    if (rawEvent.start) {
-        let mDate = moment.tz(rawEvent.start.dateTime as string, rawEvent.start.timeZone);
-        appointment.Start = new DateTime(mDate);
-        appointment.Start.kind = DateTimeKind.Unspecified;
-        //appointment.StartTimeZone = TimeZoneInfo.FindSystemTimeZoneById(rawEvent.start.timeZone);
-    }
-
-    if (rawEvent.end) {
-        let mDate = moment.tz(rawEvent.end.dateTime as string, rawEvent.end.timeZone);
-        appointment.End = new DateTime(mDate);
-        appointment.End.kind = DateTimeKind.Unspecified;
-        //appointment.EndTimeZone = TimeZoneInfo.FindSystemTimeZoneById(rawEvent.end.timeZone);
-    }
-}
-
-function mapAppointmentToApiEvent(item: Appointment): OfficeApiEvent {
-    if (!item)
-        return null;
-
-    let attendees = mapAttendees(item.RequiredAttendees, "Required");
-    let withOptional = attendees.concat(mapAttendees(item.OptionalAttendees, "Optional"));
-    let all = withOptional.concat(mapAttendees(item.Resources, "Resource"));
-
-    let result: OfficeApiEvent = null;
-
-    //@ts-ignore
-    if (item.Sensitivity !== "Normal") {
-        result = {
-            id: item.Id.UniqueId,
-            start: {
-                dateTime: item.Start.ToISOString(),
-                timeZone: 'UTC'
-            },
-            end: {
-                dateTime: item.End.ToISOString(),
-                timeZone: 'UTC'
-            },
-            type: 'singleInstance',
-            isAllDay: item.IsAllDayEvent,
-            sensitivity: <any>item.Sensitivity,
-            subject: <any>item.Sensitivity,
-            //@ts-ignore
-            showAs: getFreeBusyStatusNewName(LegacyFreeBusyStatus[item.LegacyFreeBusyStatus])
-        };
-    } else {
-        result = {
-            id: item.Id.UniqueId,
-            calendarId: (item.ParentFolderId ? item.ParentFolderId.UniqueId : ''),
-            subject: item.Subject,
-            start: {
-                dateTime: item.Start.ToISOString(),
-                timeZone: 'UTC'
-            },
-            end: {
-                dateTime: item.End.ToISOString(),
-                timeZone: 'UTC'
-            },
-            location: { displayName: item.Location },
-            isAllDay: item.IsAllDayEvent,
-            //@ts-ignore
-            showAs: getFreeBusyStatusNewName(LegacyFreeBusyStatus[item.LegacyFreeBusyStatus]),
-            categories: (item.Categories ? item.Categories.GetEnumerator() : []),
-            organizer: (item.Organizer ? ({
-                emailAddress: {
-                    name: item.Organizer.Name,
-                    address: item.Organizer.Address
-                }
-            }) : null),
-            type: getAppointmentType(<any>item.AppointmentType),
-            isReminderOn: item.IsReminderSet,
-            reminderMinutesBeforeStart: (item.IsReminderSet) ? item.ReminderMinutesBeforeStart : undefined,
-            attendees: all,
-            sensitivity: <any>item.Sensitivity,
-            body: (item.Body ? ({
-                contentType: EnumValues.getNameFromValue(BodyType, item.Body.BodyType),
-                content: item.Body.Text
-            }) : null)
-        };
-    }
-
-    return result;
-}
 
 function validateAutodiscoverRedirection(redirectionUrl: string) {
     //Todo
@@ -965,38 +685,7 @@ function validateAutodiscoverRedirection(redirectionUrl: string) {
     return true;
 }
 
-function mapAttendees(attendees: AttendeeCollection, type: string) {
-    return attendees.GetEnumerator().map(a => ({
-        type: type,
-        status: {
-            response: getResponseStatusName(a.ResponseType),
-            time: a.LastResponseTime ? a.LastResponseTime.ToISOString() : null
-        },
-        emailAddress: {
-            name: a.Name,
-            address: a.Address
-        }
-    }));
-}
 
-function applyCredentials(service: ExchangeServiceBase, request: express.Request, response: express.Response) {
-    if (request.headers[EWS_TOKEN_HEADER]) {
-        service.Credentials = new OAuthCredentials(request.headers[EWS_TOKEN_HEADER]);
-    } else if (request.headers[EWS_USER_HEADER] && request.headers[EWS_PASSWORD_HEADER] && request.headers[EWS_AUTH_TYPE_HEADER] === 'ntlm') {
-        let userEmail = request.headers[EWS_USER_HEADER];
-        let password = new Buffer(request.headers[EWS_PASSWORD_HEADER], 'base64').toString();
-        service.XHRApi = new ntlmAuthXhrApi(userEmail, password);
-        service.UseDefaultCredentials = true; //Bug... 
-    } else if (request.headers[EWS_USER_HEADER] && request.headers[EWS_PASSWORD_HEADER]) {
-        let userEmail = request.headers[EWS_USER_HEADER];
-        let password = new Buffer(request.headers[EWS_PASSWORD_HEADER], 'base64').toString();
-        service.Credentials = new WebCredentials(userEmail, password);
-    }
-    else {
-        response.status(500).send();
-        throw new Error('No Auth!');
-    }
-}
 
 function getCredentialsAsAuth(request: express.Request) {
     if (request.headers[EWS_TOKEN_HEADER]) {
@@ -1008,90 +697,6 @@ function getCredentialsAsAuth(request: express.Request) {
     }
 }
 
-function getAppointmentType(type: string) {
-    switch (type) {
-        case "Single":
-            return "singleInstance";
-        case "Occurrence":
-            return "occurrence";
-        case "Exception":
-            return "exception";
-        case "RecurringMaster":
-            return "seriesMaster";
-    }
-}
-
-function getResponseStatusName(type: MeetingResponseType) {
-    switch (type) {
-        case MeetingResponseType.Accept:
-            return "Accepted";
-        case MeetingResponseType.Decline:
-            return "Declined";
-        case MeetingResponseType.NoResponseReceived:
-            return "NotResponded";
-        case MeetingResponseType.Organizer:
-            return "Organizer";
-        case MeetingResponseType.Tentative:
-            return "TentativelyAccepted";
-        case MeetingResponseType.Unknown:
-            return "None";
-    }
-}
-
-function getFreeBusyStatusLabel(status: LegacyFreeBusyStatus): string {
-    switch (status) {
-        case LegacyFreeBusyStatus.Busy:
-            return 'Busy';
-        case LegacyFreeBusyStatus.Free:
-            return 'Free';
-        case LegacyFreeBusyStatus.NoData:
-            return 'Unknown';
-        case LegacyFreeBusyStatus.OOF:
-            return 'Out of Office';
-        case LegacyFreeBusyStatus.Tentative:
-            return 'Tentative';
-        case LegacyFreeBusyStatus.WorkingElsewhere:
-            return 'Working Elsewhere';
-    }
-}
-
-
-function getLegacyFreeBusyStatusFromName(name: string): LegacyFreeBusyStatus {
-    switch (name) {
-        case 'busy':
-            return LegacyFreeBusyStatus.Busy;
-        case 'free':
-            return LegacyFreeBusyStatus.Free;
-        case 'unknown':
-            return LegacyFreeBusyStatus.NoData;
-        case 'oof':
-            return LegacyFreeBusyStatus.OOF;
-        case 'tentative':
-            return LegacyFreeBusyStatus.Tentative;
-        case 'workingElsewhere':
-            return LegacyFreeBusyStatus.WorkingElsewhere;
-    }
-}
-
-function getFreeBusyStatusNewName(status: LegacyFreeBusyStatus): EventAvailability {
-    if (status === null)
-        return null;
-
-    switch (status) {
-        case LegacyFreeBusyStatus.Busy:
-            return <EventAvailability>'busy';
-        case LegacyFreeBusyStatus.Free:
-            return <EventAvailability>'free';
-        case LegacyFreeBusyStatus.NoData:
-            return <EventAvailability>'unknown';
-        case LegacyFreeBusyStatus.OOF:
-            return <EventAvailability>'oof';
-        case LegacyFreeBusyStatus.Tentative:
-            return <EventAvailability>'tentative';
-        case LegacyFreeBusyStatus.WorkingElsewhere:
-            return <EventAvailability>'workingElsewhere';
-    }
-}
 
 function calculateStoreId(userDn: string, serverName: string) {
     let userDnHex = ''

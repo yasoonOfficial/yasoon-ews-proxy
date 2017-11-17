@@ -6,7 +6,9 @@ export interface OfficeApiEvent {
         dateTime: string;
         timeZone: string;
     };
-
+    isReminderOn?: boolean;
+    reminderMinutesBeforeStart?: number;
+    sensitivity?: string;
     end?: {
         dateTime: string;
         timeZone: string;
@@ -14,6 +16,7 @@ export interface OfficeApiEvent {
     isAllDay?: boolean;
     color?: string;
     categories?: string[];
+    type?: string;
     location?: {
         displayName: string;
         address?: string;
