@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "sourceMap": true,
+        "target": "es2015",
+        "lib": [
+            "es2015"
+        ],
+        "allowJs": false,
+        "forceConsistentCasingInFileNames": true,
+        "noUnusedLocals": true,
+        "baseUrl": "./"
+    },
+    "include": [
+        "./node_modules/ews-javascript-api/typings/ExchangeWebService.d.ts",
+        "./express-app.ts",
+        "./model/**/*",
+        "./proxy/**/*",
+        "./extensions/**/*"
+    ]
+}

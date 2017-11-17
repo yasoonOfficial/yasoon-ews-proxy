@@ -1,0 +1,37 @@
+{
+  "name": "yasoon-ews-proxy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yasoonOfficial/yasoon-ews-proxy.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yasoonOfficial/yasoon-ews-proxy/issues"
+  },
+  "homepage": "https://github.com/yasoonOfficial/yasoon-ews-proxy/#readme",
+  "dependencies": {
+    "@types/express": "^4.0.35",
+    "@types/moment": "^2.13.0",
+    "@types/moment-timezone": "^0.2.35",
+    "@types/node": "^7.0.5",
+    "@types/request": "0.0.42",
+    "@types/request-promise": "^4.1.33",
+    "autodiscover": "yasoonOfficial/node-autodiscover",
+    "body-parser": "^1.15.2",
+    "enum-values": "^1.2.0",
+    "ews-javascript-api": "^0.9.1",
+    "ews-javascript-api-auth": "^1.2.1",
+    "express": "^4.14.0",
+    "moment": "^2.18.1",
+    "moment-timezone": "^0.5.13",
+    "request": "^2.81.0",
+    "request-promise": "^4.2.0"
+  }
+}
