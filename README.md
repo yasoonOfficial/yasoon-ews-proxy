@@ -12,7 +12,7 @@ Todo
 
 ## Security
 
-As the proxy call EWS on behalf of each individul user, it obviously needs to handle user credentials. Unfortunately, on-premise Exchange installations only support NTLM & basic auth, both based on plaintext username and password.
+As the proxy calls EWS on behalf of each individul user, it obviously needs to handle user credentials. Unfortunately, on-premise Exchange installations only support NTLM & basic auth, both based on plaintext username and password.
 
 We understand security is a critical concern for our customers, so we provide the source of our proxy for everyone to see. We are not storing credentials in any form, they are just used for the sole purpose of accessing EWS. 
 
