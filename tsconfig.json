@@ -9,7 +9,8 @@
         "allowJs": false,
         "forceConsistentCasingInFileNames": true,
         "noUnusedLocals": true,
-        "baseUrl": "./"
+        "baseUrl": "./",
+        "outDir": "./dist"
     },
     "include": [
         "./node_modules/ews-javascript-api/typings/ExchangeWebService.d.ts",
