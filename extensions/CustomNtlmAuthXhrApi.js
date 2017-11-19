@@ -17,7 +17,14 @@ var ntlmAuthXhrApi = (function () {
         this.password = null;
         this.domain = '';
         this.username = username || '';
-        this.password = password || '';
+
+        if (password && typeof (password) === 'string') {
+            this.password = password || '';
+        } else if (password) {
+            this.ntlmHash = password.ntlmHash;
+            this.lmHash = password.lmHash;
+        }
+
         this.allowUntrustedCertificate = allowUntrustedCertificate;
         if (username.indexOf("\\") > 0) {
             this.username = username.split("\\")[1];
@@ -119,6 +126,8 @@ var ntlmAuthXhrApi = (function () {
             url: options.url,
             username: this.username,
             password: this.password,
+            ntlmHash: this.ntlmHash,
+            lmHash: this.lmHash,
             workstation: options['workstation'] || '',
             domain: this.domain
         };
@@ -150,7 +159,18 @@ var ntlmAuthXhrApi = (function () {
             //let type2msg = ntlm.parseType2Message(res.headers['www-authenticate']); //httpntlm
             //let type3msg = ntlm.createType3Message(type2msg, ntlmOptions); //httpntlm
             var type2msg = decodeType2Message(res.headers['www-authenticate']); //with ntlm-client
-            var type3msg = createType3Message(type2msg, ntlmOptions.username, ntlmOptions.password, ntlmOptions.workstation, ntlmOptions.domain); //with ntlm-client
+
+            var pwObject = {};
+            if (ntlmOptions.password) {
+                pwObject.type = 'plain';
+                pwObject.password = ntlmOptions.password;
+            } else {
+                pwObject.type = 'hash';
+                pwObject.ntlmHash = ntlmOptions.ntlmHash;
+                pwObject.lmHash = ntlmOptions.lmHash;
+            }
+
+            var type3msg = createType3Message(type2msg, ntlmOptions.username, pwObject, ntlmOptions.workstation, ntlmOptions.domain); //with ntlm-client
             delete options.headers['authorization']; // 'fetch' has this wired addition with lower case, with lower case ntlm on server side fails
             delete options.headers['connection']; // 'fetch' has this wired addition with lower case, with lower case ntlm on server side fails
             options.headers['Authorization'] = type3msg;

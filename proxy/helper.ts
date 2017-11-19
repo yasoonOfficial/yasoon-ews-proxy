@@ -10,7 +10,16 @@ export function applyCredentials(service: ExchangeServiceBase, env: Environment)
         service.Credentials = new OAuthCredentials(env.ewsToken);
     } else if (env.ewsUser && env.ewsPassword && env.ewsAuthType === 'ntlm') {
         let userEmail = env.ewsUser;
-        let password = new Buffer(env.ewsPassword, 'base64').toString();
+        let password;
+        if (env.ewsPassword.indexOf('$') > 0) {
+            password = {
+                lmHash: new Buffer(env.ewsPassword.split('$')[0], 'base64'),
+                ntlmHash: new Buffer(env.ewsPassword.split('$')[1], 'base64')
+            };
+        } else {
+            password = new Buffer(env.ewsPassword, 'base64').toString();
+        }
+
         service.XHRApi = new ntlmAuthXhrApi(userEmail, password);
         service.UseDefaultCredentials = true; //Bug... 
     } else if (env.ewsUser && env.ewsPassword) {
