@@ -1,7 +1,7 @@
 import { Environment } from "model/proxy";
 import { ExchangeService, Uri } from "ews-javascript-api";
-import { applyCredentials } from "proxy/helper";
-import { GetUserPhotoRequest } from 'extensions/GetUserPhotoRequest';
+import { applyCredentials } from "../proxy/helper";
+import { GetUserPhotoRequest } from '../extensions/GetUserPhotoRequest';
 
 export class GetUserImageRequest {
 

@@ -4,7 +4,7 @@ import {
     Mailbox, ExchangeVersion, CalendarFolder,
     FolderPermission, StandardUser, FolderPermissionLevel
 } from "ews-javascript-api";
-import { applyCredentials } from "proxy/helper";
+import { applyCredentials } from "../proxy/helper";
 
 export class CreateCalendarRequest {
 

@@ -1,6 +1,6 @@
 import { ExchangeService, ItemView, Uri } from "ews-javascript-api";
-import { applyCredentials } from 'proxy/helper';
-import { FindPeopleRequest } from 'extensions/FindPeopleRequest';
+import { applyCredentials } from '../proxy/helper';
+import { FindPeopleRequest } from '../extensions/FindPeopleRequest';
 import { Environment } from 'model/proxy';
 
 export class SearchUserRequest {

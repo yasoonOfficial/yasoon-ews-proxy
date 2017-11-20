@@ -1,7 +1,7 @@
 import { Environment } from "model/proxy";
-import { applyCredentials, getCredentialsAsAuth, validateAutodiscoverRedirection } from "proxy/helper";
+import { applyCredentials, getCredentialsAsAuth, validateAutodiscoverRedirection } from "../proxy/helper";
 import { AutodiscoverService, GetUserSettingsResponse, UserSettingName } from "ews-javascript-api";
-import { AutodiscoverService as NtlmAutodiscoverService } from 'extensions/CustomAutodiscoverService';
+import { AutodiscoverService as NtlmAutodiscoverService } from '../extensions/CustomAutodiscoverService';
 import * as poxAutodiscover from 'autodiscover';
 
 export class GetPublicFolderMailboxRequest {

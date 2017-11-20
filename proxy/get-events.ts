@@ -2,8 +2,8 @@ import * as moment from 'moment-timezone';
 
 import { Environment } from "model/proxy";
 import { ExchangeService, Uri, FolderId, WellKnownFolderName, Mailbox, BasePropertySet, PropertySet, DateTime, CalendarView, AppointmentSchema, Appointment, ExchangeVersion, TimeZoneInfo } from "ews-javascript-api";
-import { applyCredentials } from "proxy/helper";
-import { mapAppointmentToApiEvent } from 'proxy/mapper';
+import { applyCredentials } from "../proxy/helper";
+import { mapAppointmentToApiEvent } from '../proxy/mapper';
 
 export interface GetEventsParams {
     email: string;

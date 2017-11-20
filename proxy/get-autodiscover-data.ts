@@ -1,10 +1,10 @@
 import { Environment } from "model/proxy";
-import { applyCredentials, validateAutodiscoverRedirection } from "proxy/helper";
+import { applyCredentials, validateAutodiscoverRedirection } from "../proxy/helper";
 import { AutodiscoverService, GetUserSettingsResponse, UserSettingName, ExchangeService, ItemView, Uri } from "ews-javascript-api";
-import { AutodiscoverService as NtlmAutodiscoverService } from 'extensions/CustomAutodiscoverService';
-import { NtlmExchangeService } from 'extensions/NtlmAutodiscoverService';
-import { ntlmAuthXhrApi } from "extensions/CustomNtlmAuthXhrApi";
-import { FindPeopleRequest } from 'extensions/FindPeopleRequest';
+import { AutodiscoverService as NtlmAutodiscoverService } from '../extensions/CustomAutodiscoverService';
+import { NtlmExchangeService } from '../extensions/NtlmAutodiscoverService';
+import { ntlmAuthXhrApi } from "../extensions/CustomNtlmAuthXhrApi";
+import { FindPeopleRequest } from '../extensions/FindPeopleRequest';
 
 export class GetAutodiscoverDataRequest {
 

@@ -5,7 +5,7 @@ import {
     ServiceResult, FolderId, WellKnownFolderName, Mailbox,
     Folder, PropertySet, BasePropertySet, FolderSchema, GetUserAvailabilityResults
 } from "ews-javascript-api";
-import { applyCredentials, getAccessArrayFromEffectiveRights } from "proxy/helper";
+import { applyCredentials, getAccessArrayFromEffectiveRights } from "../proxy/helper";
 
 
 export interface GetPermissionsParams {

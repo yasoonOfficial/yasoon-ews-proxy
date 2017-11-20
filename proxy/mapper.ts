@@ -1,7 +1,7 @@
 import * as moment from 'moment-timezone';
 import * as xmlEscape from 'xml-escape';
 
-import { OfficeApiEvent, EventAvailability } from "model/office";
+import { OfficeApiEvent, EventAvailability } from "../model/office";
 import { Appointment, BodyType, MessageBody, StringList, DateTime, DateTimeKind, AttendeeCollection, MeetingResponseType, LegacyFreeBusyStatus } from "ews-javascript-api";
 import { EnumValues } from "enum-values/src/enumValues";
 

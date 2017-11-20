@@ -6,8 +6,8 @@ import {
     AttendeeInfo, DateTime, AvailabilityOptions, FreeBusyViewType,
     TimeWindow, AvailabilityData, ServiceResult
 } from "ews-javascript-api";
-import { applyCredentials } from "proxy/helper";
-import { getFreeBusyStatusNewName, getFreeBusyStatusLabel } from 'proxy/mapper';
+import { applyCredentials } from "../proxy/helper";
+import { getFreeBusyStatusNewName, getFreeBusyStatusLabel } from '../proxy/mapper';
 import { OfficeApiEvent } from 'model/office';
 
 export interface GetFreeBusyEventsParams {

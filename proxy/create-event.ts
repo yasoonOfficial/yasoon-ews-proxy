@@ -4,8 +4,8 @@ import {
     Mailbox, Appointment, ExchangeVersion, TimeZoneInfo,
     SendInvitationsMode
 } from "ews-javascript-api";
-import { applyCredentials } from "proxy/helper";
-import { copyApiEventToAppointment } from 'proxy/mapper';
+import { applyCredentials } from "../proxy/helper";
+import { copyApiEventToAppointment } from '../proxy/mapper';
 import { OfficeApiEvent } from 'model/office';
 
 export interface CreateEventParams {

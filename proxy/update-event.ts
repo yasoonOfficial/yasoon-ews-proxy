@@ -5,8 +5,8 @@ import {
     ExchangeVersion, TimeZoneInfo, ItemId,
     SendInvitationsOrCancellationsMode, ConflictResolutionMode
 } from "ews-javascript-api";
-import { applyCredentials } from "proxy/helper";
-import { copyApiEventToAppointment } from 'proxy/mapper';
+import { applyCredentials } from "../proxy/helper";
+import { copyApiEventToAppointment } from '../proxy/mapper';
 import { OfficeApiEvent } from 'model/office';
 
 export interface UpdateUserCalendarEventParams {

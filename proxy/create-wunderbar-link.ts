@@ -7,8 +7,8 @@ import {
     GetUserSettingsResponse, UserSettingName, PropertySet,
     BasePropertySet, EmailMessage
 } from "ews-javascript-api";
-import { applyCredentials, calculateStoreId, validateAutodiscoverRedirection } from "proxy/helper";
-import { AutodiscoverService as NtlmAutodiscoverService } from 'extensions/CustomAutodiscoverService';
+import { applyCredentials, calculateStoreId, validateAutodiscoverRedirection } from "../proxy/helper";
+import { AutodiscoverService as NtlmAutodiscoverService } from '../extensions/CustomAutodiscoverService';
 
 export class CreateWunderbarLinkRequest {
 

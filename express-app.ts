@@ -1,21 +1,22 @@
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
-import { SearchUserRequest } from 'proxy/search-user';
-import { getEnvFromHeader, tryWrapper } from 'proxy/helper';
-import { GetUserRequest } from 'proxy/get-user';
-import { GetUserImageRequest } from 'proxy/get-user-image';
-import { GetCalendarsRequest } from 'proxy/get-calendars';
-import { GetEventsRequest } from 'proxy/get-events';
-import { CreateEventRequest } from 'proxy/create-event';
-import { UpdateEventRequest } from 'proxy/update-event';
-import { GetFreeBusyEventsRequest } from 'proxy/get-free-busy-events';
-import { GetPermissionsRequest } from 'proxy/get-permissions';
-import { CreateCalendarRequest } from 'proxy/create-calendar';
-import { CreateWunderbarLinkRequest } from 'proxy/create-wunderbar-link';
-import { GetPublicFolderMailboxRequest } from 'proxy/get-publicfolder-mailbox';
-import { GetAutodiscoverDataRequest } from 'proxy/get-autodiscover-data';
+import { SearchUserRequest } from './proxy/search-user';
+import { getEnvFromHeader, tryWrapper } from './proxy/helper';
+import { GetUserRequest } from './proxy/get-user';
+import { GetUserImageRequest } from './proxy/get-user-image';
+import { GetCalendarsRequest } from './proxy/get-calendars';
+import { GetEventsRequest } from './proxy/get-events';
+import { CreateEventRequest } from './proxy/create-event';
+import { UpdateEventRequest } from './proxy/update-event';
+import { GetFreeBusyEventsRequest } from './proxy/get-free-busy-events';
+import { GetPermissionsRequest } from './proxy/get-permissions';
+import { CreateCalendarRequest } from './proxy/create-calendar';
+import { CreateWunderbarLinkRequest } from './proxy/create-wunderbar-link';
+import { GetPublicFolderMailboxRequest } from './proxy/get-publicfolder-mailbox';
+import { GetAutodiscoverDataRequest } from './proxy/get-autodiscover-data';
 import { EwsLogging } from 'ews-javascript-api';
-import { EWS_AUTH_TYPE_HEADER, EWS_TOKEN_HEADER, EWS_URL_HEADER, EWS_USER_HEADER, EWS_PASSWORD_HEADER } from 'model/constants';
+import { EWS_AUTH_TYPE_HEADER, EWS_TOKEN_HEADER, EWS_URL_HEADER, EWS_USER_HEADER, EWS_PASSWORD_HEADER } from './model/constants';
+import { DeleteEventRequest } from './proxy/delete-event';
 
 const customHeaders = [
     EWS_AUTH_TYPE_HEADER,
@@ -154,6 +155,17 @@ app.post('/user/:email/create-wunderbar-link', tryWrapper(async (req: express.Re
 
 app.get('/', (req, res) => {
     res.status(200).send('You have been served. Nothing to see, please move on. <br/>The Job (⌐■_■)');
+});
+
+app.post('/user/:email/calendars/:id/events/:eventId/delete', async (req: express.Request, res: express.Response) => {
+    let deleteRequest = new DeleteEventRequest();
+    await deleteRequest.execute(getEnvFromHeader(req), {
+        eventId: req.params.eventId,
+        sendCancellationsMode: req.body.sendCancellationsMode,
+        affectedTaskOccurrence: req.body.affectedTaskOccurrence,
+        type: req.body.type
+    });
+    res.send(200);
 });
 
 export = app;
