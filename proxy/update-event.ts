@@ -22,17 +22,7 @@ export class UpdateEventRequest {
         service.Url = new Uri(env.ewsUrl);
         applyCredentials(service, env);
 
-        let targetFolderId: FolderId = null;
         let rawEvent: OfficeApiEvent = payload;
-
-        //Get folder instance
-        if (params.calendarId === 'main') {
-            targetFolderId = new FolderId(WellKnownFolderName.Calendar, new Mailbox(params.email));
-        } else {
-            targetFolderId = new FolderId();
-            targetFolderId.UniqueId = params.calendarId;
-        }
-
         let appointment = await Appointment.Bind(service, new ItemId(params.eventId));
         copyApiEventToAppointment(rawEvent, appointment);
 
