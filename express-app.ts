@@ -161,8 +161,9 @@ app.post('/user/:email/calendars/:id/events/:eventId/delete', async (req: expres
     let deleteRequest = new DeleteEventRequest();
     await deleteRequest.execute(getEnvFromHeader(req), {
         eventId: req.params.eventId,
-        sendCancellationsMode: req.body.sendCancellationsMode,
-        affectedTaskOccurrence: req.body.affectedTaskOccurrence,
+        sendCancellations: req.body.sendCancellations,
+        entireSeries: req.body.entireSeries,
+        cancellationMessage: req.body.cancellationMessage,
         type: req.body.type
     });
     res.send(200);
