@@ -1,7 +1,6 @@
 import { Environment } from "model/proxy";
 import {
-    ExchangeService, Uri, FolderId,
-    WellKnownFolderName, Mailbox, Appointment,
+    ExchangeService, Uri, Appointment,
     ExchangeVersion, TimeZoneInfo, ItemId,
     SendInvitationsOrCancellationsMode, ConflictResolutionMode
 } from "ews-javascript-api";

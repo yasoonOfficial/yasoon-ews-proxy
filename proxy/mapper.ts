@@ -5,7 +5,6 @@ import { OfficeApiEvent, EventAvailability } from "../model/office";
 import { Appointment, BodyType, MessageBody, StringList, DateTime, DateTimeKind, AttendeeCollection, MeetingResponseType, LegacyFreeBusyStatus } from "ews-javascript-api";
 import { EnumValues } from "enum-values/src/enumValues";
 
-
 export function copyApiEventToAppointment(rawEvent: OfficeApiEvent, appointment: Appointment) {
     //Let the mapping begin!
     if (rawEvent.attendees) {
