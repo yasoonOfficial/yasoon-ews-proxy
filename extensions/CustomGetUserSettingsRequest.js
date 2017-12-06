@@ -60,14 +60,14 @@ var GetUserSettingsRequest = (function (_super) {
     GetUserSettingsRequest.prototype.ReadSoapHeader = function (reader) {
         _super.prototype.ReadSoapHeader.call(this, reader);
         return;
-        if (this.expectPartnerToken) {
+        /*if (this.expectPartnerToken) {
             if (reader.IsElement(XmlNamespace_1.XmlNamespace.Autodiscover, XmlElementNames_1.XmlElementNames.PartnerToken)) {
                 this.PartnerToken = reader.ReadInnerXml();
             }
             if (reader.IsElement(XmlNamespace_1.XmlNamespace.Autodiscover, XmlElementNames_1.XmlElementNames.PartnerTokenReference)) {
                 this.PartnerTokenReference = reader.ReadInnerXml();
             }
-        }
+        }*/
     };
     GetUserSettingsRequest.prototype.Validate = function () {
         _super.prototype.Validate.call(this);

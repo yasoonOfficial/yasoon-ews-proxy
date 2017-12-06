@@ -524,12 +524,10 @@ var AutodiscoverService = (function (_super) {
                         // in SCP lookups. Disable consideration of SCP records.
                         _this.ThrowIfDuplicateRedirection(response.RedirectTarget, { getValue: function () { return redirectionEmailAddresses; } });
                         return _this.InternalGetSoapUserSettingsRecursive(smtpAddresses, requestedSettings, redirectionEmailAddresses, currentHop);
-                        break;
                     case AutodiscoverErrorCode_1.AutodiscoverErrorCode.RedirectUrl:
                         _this.TraceMessage(TraceFlags_1.TraceFlags.AutodiscoverResponse, ExtensionMethods_1.StringHelper.Format("Autodiscover service returned redirection URL '{0}'.", response.RedirectTarget));
                         _this.Url = _this.Credentials.AdjustUrl(new Uri_1.Uri(response.RedirectTarget));
                         return _this.InternalGetSoapUserSettingsRecursive(smtpAddresses, requestedSettings, redirectionEmailAddresses, currentHop);
-                        break;
                     case AutodiscoverErrorCode_1.AutodiscoverErrorCode.NoError:
                     default:
                         return response;
@@ -606,6 +604,7 @@ var AutodiscoverService = (function (_super) {
                 }
                 // If we have WLID credentials, make sure that we have a WS-Security endpoint
                 return true;
+                /*
                 if (_this.Credentials instanceof WindowsLiveCredentials_1.WindowsLiveCredentials) {
                     if ((endpoints & AutodiscoverEndpoints_1.AutodiscoverEndpoints.WsSecurity) != AutodiscoverEndpoints_1.AutodiscoverEndpoints.WsSecurity) {
                         _this.TraceMessage(TraceFlags_1.TraceFlags.AutodiscoverConfiguration, ExtensionMethods_1.StringHelper.Format("No Autodiscover WS-Security endpoint is available for host {0}", host));
@@ -638,7 +637,7 @@ var AutodiscoverService = (function (_super) {
                     // the corresponding x-header, we will go with OAuth.
                     url.outValue = new Uri_1.Uri(ExtensionMethods_1.StringHelper.Format(AutodiscoverService.AutodiscoverSoapHttpsUrl, host));
                 }
-                return true;
+                return true;*/
             }
             else {
                 _this.TraceMessage(TraceFlags_1.TraceFlags.AutodiscoverConfiguration, ExtensionMethods_1.StringHelper.Format("No Autodiscover endpoints are available for host {0}", host));

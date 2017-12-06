@@ -10,7 +10,7 @@ export class SearchUserRequest {
         service.Url = new Uri(env.ewsUrl);
         applyCredentials(service, env);
 
-        var request = new FindPeopleRequest(service, null);
+        var request = <any>new FindPeopleRequest(service, null);
         request.QueryString = params.searchTerm;
         request.View = new ItemView(100);
         let response = await request.Execute();

@@ -43,6 +43,8 @@ export class CreateWunderbarLinkRequest {
 
         //Configure Autodiscover Service
         let autodiscoverService = new NtlmAutodiscoverService();
+
+        //@ts-ignore
         autodiscoverService.RedirectionUrlValidationCallback = validateAutodiscoverRedirection;
         applyCredentials(autodiscoverService, env);
 

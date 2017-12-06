@@ -8,7 +8,7 @@ export class GetPublicFolderMailboxRequest {
 
     async execute(env: Environment, params: { email: string }) {
         let userEmail = params.email;
-        let service: AutodiscoverService = new NtlmAutodiscoverService();
+        let service: AutodiscoverService = <any>new NtlmAutodiscoverService();
         service.RedirectionUrlValidationCallback = validateAutodiscoverRedirection;
         applyCredentials(service, env);
 

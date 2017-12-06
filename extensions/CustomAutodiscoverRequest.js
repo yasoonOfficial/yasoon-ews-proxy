@@ -241,10 +241,11 @@ var AutodiscoverRequest = (function () {
     AutodiscoverRequest.prototype.ReadSoapBody = function (reader) {
         var responses = this.LoadFromObject(reader.JsObject);
         return responses;
+        /*
         reader.ReadStartElement(XmlNamespace_1.XmlNamespace.Soap, XmlElementNames_1.XmlElementNames.SOAPBodyElementName);
         var responses = this.LoadFromXml(reader);
         //reader.ReadEndElement(XmlNamespace.Soap, XmlElementNames.SOAPBodyElementName);
-        return responses;
+        return responses;*/
     };
     /**@internal */
     AutodiscoverRequest.prototype.ReadSoapFault = function (reader) {

@@ -10,12 +10,12 @@ export class GetAutodiscoverDataRequest {
 
     async execute(env: Environment, params: { email: string }) {
         let userEmail = params.email;
-        let service: ExchangeService = new NtlmExchangeService();
+        let service: ExchangeService = <any>new NtlmExchangeService();
         applyCredentials(service, env);
 
         await service.AutodiscoverUrl(userEmail, validateAutodiscoverRedirection);
 
-        let discoverService: AutodiscoverService = new NtlmAutodiscoverService();
+        let discoverService: AutodiscoverService = <any>new NtlmAutodiscoverService();
         discoverService.RedirectionUrlValidationCallback = validateAutodiscoverRedirection;
         applyCredentials(discoverService, env);
 
@@ -44,7 +44,7 @@ export class GetAutodiscoverDataRequest {
             testService.XHRApi = new ntlmAuthXhrApi(userEmail, new Buffer(env.ewsPassword, 'base64').toString());
             testService.UseDefaultCredentials = true; //Bug... 
 
-            var request = new FindPeopleRequest(testService, null);
+            var request = <any>new FindPeopleRequest(testService, null);
             request.QueryString = userEmail;
             request.View = new ItemView(100);
             await request.Execute();

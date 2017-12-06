@@ -4,14 +4,18 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rimraf dist && tsc && xcopy .\\node_modules .\\dist\\node_modules /i /s /q /h /y /c && xcopy .\\app.js .\\dist\\app.js*",
+    "pkg": "pkg .\\dist\\app.js --out-path dist",
+    "replaceIcon": ".\\res\\ResourceHacker.exe -open .\\dist\\app-win.exe -save .\\dist\\ews-proxy.exe -action addoverwrite -res .\\res\\logo.ico -mask ICONGROUP,1,1033",
+    "replaceManifest": ".\\res\\ResourceHacker.exe -open .\\res\\res.rc -action compile -save .\\res\\res.res && .\\res\\ResourceHacker.exe -open .\\dist\\ews-proxy.exe -resource .\\res\\res.res -action addoverwrite -save .\\dist\\ews-proxy.exe"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/yasoonOfficial/yasoon-ews-proxy.git"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/yasoonOfficial/yasoon-ews-proxy/issues"
   },
@@ -21,8 +25,9 @@
     "@types/moment": "^2.13.0",
     "@types/moment-timezone": "^0.2.35",
     "@types/node": "^7.0.5",
-    "@types/request": "0.0.42",
+    "@types/request": "^2.0.8",
     "@types/request-promise": "^4.1.33",
+    "@types/xml2js": "^0.4.2",
     "autodiscover": "yasoonOfficial/node-autodiscover",
     "body-parser": "^1.15.2",
     "enum-values": "^1.2.0",
@@ -32,8 +37,12 @@
     "moment": "^2.18.1",
     "moment-timezone": "^0.5.13",
     "ntlm-client": "yasoonOfficial/node-ntlm-client",
+    "pkg": "^4.3.0-beta.1",
     "request": "^2.81.0",
     "request-promise": "^4.2.0",
-    "xml-escape": "^1.1.0"
+    "rimraf": "^2.6.2",
+    "typescript": "^2.6.2",
+    "xml-escape": "^1.1.0",
+    "xml2js": "^0.4.19"
   }
 }

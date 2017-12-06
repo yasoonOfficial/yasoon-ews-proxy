@@ -10,7 +10,7 @@ export class GetUserImageRequest {
         service.Url = new Uri(env.ewsUrl);
         applyCredentials(service, env);
 
-        var request = new GetUserPhotoRequest(service, null);
+        var request = <any>new GetUserPhotoRequest(service, null);
         request.EmailAddress = params.email;
         request.Size = 360;
 

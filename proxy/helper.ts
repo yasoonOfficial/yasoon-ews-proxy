@@ -1,11 +1,11 @@
-import { WebCredentials, ExchangeServiceBase, OAuthCredentials, SoapFaultDetails } from "ews-javascript-api";
+import { WebCredentials, OAuthCredentials, SoapFaultDetails } from "ews-javascript-api";
 import { ntlmAuthXhrApi } from "../extensions/CustomNtlmAuthXhrApi";
 import { Environment } from "model/proxy";
-import { EWS_AUTH_TYPE_HEADER, EWS_PASSWORD_HEADER, EWS_TOKEN_HEADER, EWS_URL_HEADER, EWS_USER_HEADER, EWS_URL_OFFICE_365 } from "../model/constants";
+import { EWS_AUTH_TYPE_HEADER, EWS_PASSWORD_HEADER, EWS_TOKEN_HEADER, EWS_URL_HEADER, EWS_USER_HEADER, EWS_URL_OFFICE_365, PROXY_SECRET_HEADER } from "../model/constants";
 
 import * as express from 'express';
 
-export function applyCredentials(service: ExchangeServiceBase, env: Environment) {
+export function applyCredentials(service: any, env: Environment) {
     if (env.ewsToken) {
         service.Credentials = new OAuthCredentials(env.ewsToken);
     } else if (env.ewsUser && env.ewsPassword && env.ewsAuthType === 'ntlm') {
@@ -32,7 +32,11 @@ export function applyCredentials(service: ExchangeServiceBase, env: Environment)
     }
 }
 
-export function getEnvFromHeader(req: express.Request): Environment {
+export function getEnvFromHeader(req: express.Request, secret: string): Environment {
+    if (secret && req.headers[PROXY_SECRET_HEADER] !== secret) {
+        throw new Error('Invalid Secret');
+    }
+
     return {
         ewsAuthType: req.headers[EWS_AUTH_TYPE_HEADER],
         ewsToken: req.headers[EWS_TOKEN_HEADER],
@@ -128,9 +132,10 @@ export function validateAutodiscoverRedirection(redirectionUrl: string) {
     return true;
 }
 
-export function tryWrapper(func: (req: express.Request, res: express.Response) => Promise<any>): (req: express.Request, res: express.Response) => void {
+export function requestWrapper(func: (req: express.Request, res: express.Response) => Promise<any>): (req: express.Request, res: express.Response) => void {
     return (async (req: express.Request, res: express.Response) => {
         try {
+            console.log("Processing ", req.path);
             await func(req, res);
         }
         catch (e) {

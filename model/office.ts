@@ -39,6 +39,33 @@ export interface SingleValueExtendedProperty {
     value: string;
 }
 
+export interface XmlCategoriesResult {
+    categories: XmlCategories;
+}
+
+export interface XmlCategories {
+    category: XmlCategory[];
+}
+
+export interface XmlCategory {
+    $: {
+        color: string;
+        guid: string;
+        keyboardShortcut: string;
+        lastSessionUsed: string;
+        lastTimeUsed: string;
+        lastTimeUsedCalendar: string;
+        lastTimeUsedContacts: string;
+        lastTimeUsedJournal: string;
+        lastTimeUsedMail: string;
+        lastTimeUsedNotes: string;
+        lastTimeUsedTasks: string;
+        name: string;
+        renameOnFirstUse: string;
+        usageCount: string;
+    }
+}
+
 export interface OfficeEventAttendee {
     type?: string;
     status?: {
