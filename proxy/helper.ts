@@ -40,7 +40,7 @@ export function getEnvFromHeader(req: express.Request, secret: string): Environm
     return {
         ewsAuthType: req.headers[EWS_AUTH_TYPE_HEADER],
         ewsToken: req.headers[EWS_TOKEN_HEADER],
-        ewsUrl: req.headers[EWS_URL_HEADER] as string || EWS_URL_OFFICE_365,
+        ewsUrl: req.headers[EWS_URL_HEADER] || EWS_URL_OFFICE_365,
         ewsUser: req.headers[EWS_USER_HEADER],
         ewsPassword: req.headers[EWS_PASSWORD_HEADER]
     };
