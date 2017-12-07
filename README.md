@@ -1,6 +1,6 @@
 # Restful API proxy for Exchange Web Services (EWS)
 
-This repository contains the sources of our EWS proxy. It's necessary to proxy the requests, as Exchange does not support CORS at all, so accessing EWS from the browser is not possible. The proxy is currently used by our following products:
+This repository contains the sources of our EWS proxy. It's necessary to proxy the requests, as Exchange does not support CORS, so accessing EWS directly from the browser is not possible. The proxy is currently used by our following products:
 
 - Office Calendars for Confluence
 
@@ -17,6 +17,8 @@ As the proxy calls EWS on behalf of each individul user, it obviously needs to h
 We understand security is a critical concern for our customers, so we provide the source of our proxy for everyone to see. We are not storing credentials in any form, they are just used for the sole purpose of accessing EWS. 
 
 As this may be a dealbreaker for certain industries, it it possible to self-host the proxy. We'll be providing a possibility to change the proxy URL in our products that use this proxy. Please [contact](mailto:contact@yasoon.com) us to discuss specifics, we can help you setup the proxy in your environment and enable features like SSL.
+
+You can also decide to test everything using our proxy and decide to run the proxy on your own for production usage.
 
 ## Coming up next
 

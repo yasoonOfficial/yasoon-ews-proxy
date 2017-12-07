@@ -59,7 +59,7 @@ app.get('/autodiscover', requestWrapper(async (req: express.Request, res: expres
 
 app.get('/user/:email/publicFolderMailbox', requestWrapper(async (req: express.Request, res: express.Response) => {
     let getPublicFolder = new GetPublicFolderMailboxRequest();
-    let result = await getPublicFolder.execute(getEnvFromHeader(req, secret), req.query);
+    let result = await getPublicFolder.execute(getEnvFromHeader(req, secret), req.params);
     res.send(result);
 }));
 
@@ -71,13 +71,13 @@ app.get('/user/search', requestWrapper(async (req: express.Request, res: express
 
 app.get('/user/:email', requestWrapper(async (req: express.Request, res: express.Response) => {
     let getUser = new GetUserRequest();
-    let result = await getUser.execute(getEnvFromHeader(req, secret), req.query);
+    let result = await getUser.execute(getEnvFromHeader(req, secret), req.params);
     res.send(result);
 }));
 
 app.get('/user/:email/photo', requestWrapper(async (req: express.Request, res: express.Response) => {
     let getUserImage = new GetUserImageRequest();
-    let result = await getUserImage.execute(getEnvFromHeader(req, secret), req.query);
+    let result = await getUserImage.execute(getEnvFromHeader(req, secret), req.params);
 
     res.set('Content-Type', result.mimeType);
     res.send(result.content);
@@ -85,13 +85,13 @@ app.get('/user/:email/photo', requestWrapper(async (req: express.Request, res: e
 
 app.get('/user/:email/calendars', requestWrapper(async (req: express.Request, res: express.Response) => {
     let getUserCalendar = new GetCalendarsRequest();
-    let result = await getUserCalendar.execute(getEnvFromHeader(req, secret), req.query);
+    let result = await getUserCalendar.execute(getEnvFromHeader(req, secret), req.params);
     res.send(result);
 }));
 
 app.get('/user/:email/categories', requestWrapper(async (req: express.Request, res: express.Response) => {
     let getCategories = new GetCategoriesRequest();
-    let result = await getCategories.execute(getEnvFromHeader(req, secret), req.query);
+    let result = await getCategories.execute(getEnvFromHeader(req, secret), req.params);
     res.send(result);
 }));
 
