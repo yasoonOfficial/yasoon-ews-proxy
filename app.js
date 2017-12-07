@@ -12,9 +12,16 @@ process.argv.forEach((val, index) => {
         debugLogEnabled = true;
 });
 
-console.log('Running Exchange Web Service Proxy on http://localhost:' + port + ' using secret ' + secret);
+console.log('Running Exchange Web Service Proxy on http://localhost:' + port);
 if (debugLogEnabled) {
     console.log('  => Verbose Logging active');
+}
+
+if (!secret) {
+    console.log('  => Using default secret: 9e633a7256ff4073821f4890fafd29f5');
+    secret = '9e633a7256ff4073821f4890fafd29f5';
+} else {
+    console.log('  => Using provided secret: ' + secret);
 }
 
 var app = require('./express-app');
