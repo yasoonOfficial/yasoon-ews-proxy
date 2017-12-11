@@ -145,6 +145,10 @@ export function requestWrapper(func: (req: express.Request, res: express.Respons
                 res.status(500).send();
             }
 
+            //Valid response, don't log anything
+            if (e.HttpStatusCode === 404)
+                return;
+
             if (e && e.message) {
                 console.log(e.message);
             }

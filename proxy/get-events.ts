@@ -45,6 +45,9 @@ export class GetEventsRequest {
 
         try {
             let ewsResult = await service.FindAppointments(ewsFolder, calendarView);
+            if (ewsResult.Items.length === 0)
+                return [];
+
             let itemResponse = await service.BindToItems(ewsResult.Items.map(i => i.Id), PropertySet.FirstClassProperties);
 
             let responseArray = [];
