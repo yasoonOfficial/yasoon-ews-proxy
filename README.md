@@ -23,7 +23,13 @@ Just clone the repository and execute the following commands (you'll need NodeJS
 
 `
 npm install
+`
+
+`
 npm run build
+`
+
+`
 node ./dist/app.js
 `
 
@@ -34,15 +40,19 @@ Just download the binary file from the releases page for your OS. It comes bundl
 ## Commandline Options
 
 You can use the following commandline options to customize some behaviour:
-`Use a different port than default (3000)
+
+### Use a different port than default (3000)
+`
 --port=1234
 `
 
-`Use a different secret than default (recommended)
+### Use a different secret than default (recommended)
+`
 --secret=somelongsecret
 `
 
-`Enable debug logging
+### Enable debug logging
+`
 --verbose
 `
 
@@ -58,6 +68,5 @@ You can also decide to test everything using our proxy and decide to run the pro
 
 ## Coming up next
 
-- We'll be enabling our producs (currently only Office Calendars for Confluence) to support a self-hosted proxy. This will be as simple as switching the proxy URL. 
 - We will be providing a docker image / VM for quick installation
 - We will also provide a detailed guide for manual installation
