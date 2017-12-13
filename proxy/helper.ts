@@ -1,4 +1,4 @@
-import { WebCredentials, OAuthCredentials, SoapFaultDetails } from "ews-javascript-api";
+import { WebCredentials, OAuthCredentials, SoapFaultDetails, EffectiveRights } from "ews-javascript-api";
 import { ntlmAuthXhrApi } from "../extensions/CustomNtlmAuthXhrApi";
 import { Environment } from "model/proxy";
 import { EWS_AUTH_TYPE_HEADER, EWS_PASSWORD_HEADER, EWS_TOKEN_HEADER, EWS_URL_HEADER, EWS_USER_HEADER, EWS_URL_OFFICE_365, PROXY_SECRET_HEADER } from "../model/constants";
@@ -48,9 +48,19 @@ export function getEnvFromHeader(req: express.Request, secret: string): Environm
 
 export function getAccessArrayFromEffectiveRights(effectiveRights: any) {
     if (effectiveRights && Number.isInteger(effectiveRights)) {
-        //Todo!!!
-        throw new Error('not supported yet, todo!');
-        //Bug in ews-javascript-api, see https://github.com/gautamsi/ews-javascript-api/pull/214
+        let access = [];
+        if ((effectiveRights & EffectiveRights.CreateContents) !== 0)
+            access.push('create');
+        if ((effectiveRights & EffectiveRights.CreateHierarchy) !== 0)
+            access.push('createFolder');
+        if ((effectiveRights & EffectiveRights.Delete) !== 0)
+            access.push('delete');
+        if ((effectiveRights & EffectiveRights.Modify) !== 0)
+            access.push('edit');
+        if ((effectiveRights & EffectiveRights.Read) !== 0)
+            access.push('read');
+
+        return access;
     } else if (effectiveRights && effectiveRights['__type'] === 'EffectiveRights') {
         let rights: {
             CreateAssociated: "true" | "false",

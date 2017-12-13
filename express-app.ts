@@ -18,6 +18,7 @@ import { EwsLogging } from 'ews-javascript-api';
 import { EWS_AUTH_TYPE_HEADER, EWS_TOKEN_HEADER, EWS_URL_HEADER, EWS_USER_HEADER, EWS_PASSWORD_HEADER, PROXY_SECRET_HEADER } from './model/constants';
 import { DeleteEventRequest } from './proxy/delete-event';
 import { GetCategoriesRequest } from './proxy/get-categories';
+import { Monkey } from './extensions/Monkey';
 
 const customHeaders = [
     EWS_AUTH_TYPE_HEADER,
@@ -44,6 +45,9 @@ app['configureApp'] = (s, l) => {
 };
 
 EwsLogging.DebugLogEnabled = false;
+
+//Fix for https://github.com/gautamsi/ews-javascript-api/pull/219
+new Monkey().patch();
 
 app.post('/logging', (req: express.Request, res: express.Response) => {
     EwsLogging.DebugLogEnabled = req.body.enabled;
