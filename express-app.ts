@@ -129,7 +129,7 @@ app.patch('/user/:email/calendars/:id/events/:eventId', requestWrapper(async (re
         eventId: req.params.eventId
     }, req.body);
 
-    res.send(200);
+    res.status(200).send();
 }));
 
 app.get('/user/:email/calendars/:id/free-busy', requestWrapper(async (req: express.Request, res: express.Response) => {
@@ -184,7 +184,7 @@ app.post('/user/:email/calendars/:id/events/:eventId/delete', requestWrapper(asy
         cancellationMessage: req.body.cancellationMessage,
         type: req.body.type
     });
-    res.send(200);
+    res.status(200).send();
 }));
 
 export = app;
