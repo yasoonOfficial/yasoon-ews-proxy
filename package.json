@@ -37,7 +37,7 @@
 		"express": "^4.16.2",
 		"moment": "^2.18.1",
 		"moment-timezone": "^0.5.13",
-		"ntlm-client": "yasoonOfficial/node-ntlm-client",
+		"ntlm-client": "github:yasoonOfficial/node-ntlm-client",
 		"pkg": "^4.3.0-beta.1",
 		"request": "^2.81.0",
 		"request-promise": "^4.2.0",
