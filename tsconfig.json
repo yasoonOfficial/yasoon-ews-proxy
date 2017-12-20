@@ -16,6 +16,7 @@
     "include": [
         "./node_modules/ews-javascript-api/typings/ExchangeWebService.d.ts",
         "./express-app.ts",
+        "./lambda-app.ts",
         "./model/**/*",
         "./proxy/**/*",
         "./extensions/**/*"
