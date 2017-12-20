@@ -15,7 +15,7 @@ It's necessary to proxy the SOAP XML requests to the Exchange server, as it does
 
 To use the proxy locally, you have two options:
 - Run the proxy from source
-- Use the provided binaries (soon)
+- Use the provided binaries
 
 ### Running from source
 
@@ -33,7 +33,7 @@ npm run build
 node ./dist/app.js
 `
 
-### Running from binaries (soon)
+### Running from binaries
 
 Just download the binary file from the releases page for your OS. It comes bundled with all dependencies, so you can just run it without installing anything else first.
 
