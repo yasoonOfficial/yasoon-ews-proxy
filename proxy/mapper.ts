@@ -59,23 +59,21 @@ export function copyApiEventToAppointment(rawEvent: OfficeApiEvent, appointment:
         appointment.IsReminderSet = false;
     }
 
-    //So the EWS library tries to be smart but fails spectacularly. When new DateTime() recieves
-    // a moment date which is not in UTC, it will transmit it as UTC, but recalculated.
-    // This is all fine, since Exchange can handle this, and we set the StartTimeZone accordingly.
-    // For all day events however, this is incorrect. Exchange expects All Day events to start @ 00:00:00
-    // You cannot change all day event timezones, because they should be all day in all timezones, therefore, 
-    // it seems that this is ingored @ Exchange, so 23:00:00 will not be interpreted relativley to the provided
-    // timezone. Fix this by telling faking the timezone to UTC, so no recalculation will happen
-    let baseStartTimezone = (rawEvent.isAllDay === true) ? 'UTC' : rawEvent.start.timeZone;
-    let baseEndTimezone = (rawEvent.isAllDay === true) ? 'UTC' : rawEvent.end.timeZone;
-
     //Updating timezones on all day events: Exchange no likey likey
     // => If it's a new appointment (all day or not) -> Set the timezone
     // => If the new or updated event has allDay explicitly set to false (e.g. moving allDayEvent => nonAllDay) -> Set timezone (might change :D)
     // => Otherwise, if the existing appointment is not an all day event to begin with, update timezone always
-    let provideTimeZone = appointment.IsNew || rawEvent.isAllDay === false || !appointment.IsAllDayEvent
+    let provideTimeZone = appointment.IsNew || rawEvent.isAllDay === false || !appointment.IsAllDayEvent;
 
     if (rawEvent.start) {
+        //So the EWS library tries to be smart but fails spectacularly. When new DateTime() recieves
+        // a moment date which is not in UTC, it will transmit it as UTC, but recalculated.
+        // This is all fine, since Exchange can handle this, and we set the StartTimeZone accordingly.
+        // For all day events however, this is incorrect. Exchange expects All Day events to start @ 00:00:00
+        // You cannot change all day event timezones, because they should be all day in all timezones, therefore, 
+        // it seems that this is ingored @ Exchange, so 23:00:00 will not be interpreted relativley to the provided
+        // timezone. Fix this by telling faking the timezone to UTC, so no recalculation will happen
+        let baseStartTimezone = (rawEvent.isAllDay === true) ? 'UTC' : rawEvent.start.timeZone;
         let mDate = moment.tz(rawEvent.start.dateTime as string, baseStartTimezone);
         appointment.Start = new DateTime(mDate);
         appointment.Start.kind = DateTimeKind.Unspecified;
@@ -85,6 +83,7 @@ export function copyApiEventToAppointment(rawEvent: OfficeApiEvent, appointment:
     }
 
     if (rawEvent.end) {
+        let baseEndTimezone = (rawEvent.isAllDay === true) ? 'UTC' : rawEvent.end.timeZone;
         let mDate = moment.tz(rawEvent.end.dateTime as string, baseEndTimezone);
         appointment.End = new DateTime(mDate);
         appointment.End.kind = DateTimeKind.Unspecified;
