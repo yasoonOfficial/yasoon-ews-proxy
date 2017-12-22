@@ -23,22 +23,16 @@ export class DeleteEventRequest {
         if (params.sendCancellations === true)
             sendCancellationsMode = SendCancellationsMode.SendToAllAndSaveCopy;
 
-        let affectedTaskOccurrence = AffectedTaskOccurrence.SpecifiedOccurrenceOnly;
-        if (params.entireSeries === true)
-            affectedTaskOccurrence = AffectedTaskOccurrence.AllOccurrences;
-
+        let appointment: Appointment;
+        if (params.entireSeries === true) {
+            appointment = await Appointment.BindToRecurringMaster(service, new ItemId(params.eventId));
+        } else {
+            appointment = await Appointment.Bind(service, new ItemId(params.eventId));
+        }
         if (params.type === "delete") {
-            let itemId = new ItemId(params.eventId);
-            await service.DeleteItems([itemId], DeleteMode.MoveToDeletedItems, sendCancellationsMode, affectedTaskOccurrence);
+            await appointment.Delete(DeleteMode.MoveToDeletedItems, sendCancellationsMode);
 
         } else if (params.type === "cancel") {
-            let appointment: Appointment;
-            if (affectedTaskOccurrence === AffectedTaskOccurrence.AllOccurrences) {
-                appointment = await Appointment.BindToRecurringMaster(service, new ItemId(params.eventId));
-            } else if (affectedTaskOccurrence === AffectedTaskOccurrence.SpecifiedOccurrenceOnly) {
-                appointment = await Appointment.Bind(service, new ItemId(params.eventId));
-            }
-
             if (appointment.IsMeeting && sendCancellationsMode === SendCancellationsMode.SendToAllAndSaveCopy) {
                 // If it's a meeting and the user is the organizer, cancel it.
                 // Determine this by testing the AppointmentState bitmask for 
