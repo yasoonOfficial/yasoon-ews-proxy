@@ -128,7 +128,7 @@ export function mapAppointmentToApiEvent(item: Appointment): OfficeApiEvent {
                 }
             }) : null),
             type: getAppointmentType(<any>item.AppointmentType),
-            seriesMasterId: (item.AppointmentType === AppointmentType.Occurrence || item.AppointmentType === AppointmentType.Exception) ? "masterFor:" + item.Id.UniqueId : null,
+            seriesMasterId: (isSeriesItem(item)) ? "masterFor:" + item.Id.UniqueId : undefined,
             isReminderOn: item.IsReminderSet,
             reminderMinutesBeforeStart: (item.IsReminderSet) ? item.ReminderMinutesBeforeStart : undefined,
             attendees: all,
@@ -158,6 +158,13 @@ export function mapAttendees(attendees: AttendeeCollection, type: string) {
     }));
 }
 
+export function isSeriesItem(appointment: Appointment) {
+    if (typeof (appointment.AppointmentType) === 'string') {
+        return appointment.AppointmentType === 'Occurrence' || appointment.AppointmentType === 'Exception';
+    } else {
+        return appointment.AppointmentType === AppointmentType.Exception || appointment.AppointmentType === AppointmentType.Occurrence;
+    }
+}
 
 export function getAppointmentType(type: string) {
     switch (type) {
