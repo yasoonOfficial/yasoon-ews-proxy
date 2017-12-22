@@ -1,5 +1,6 @@
 import * as moment from 'moment-timezone';
 import * as xmlEscape from 'xml-escape';
+import * as url from 'url';
 
 import { OfficeApiEvent, EventAvailability } from "../model/office";
 import { Appointment, BodyType, MessageBody, StringList, DateTime, DateTimeKind, AttendeeCollection, MeetingResponseType, LegacyFreeBusyStatus, TimeZoneInfo, AppointmentType } from "ews-javascript-api";
@@ -83,6 +84,12 @@ export function mapAppointmentToApiEvent(item: Appointment): OfficeApiEvent {
     let all = withOptional.concat(mapAttendees(item.Resources, "Resource"));
 
     let result: OfficeApiEvent = null;
+    let webLink: string = undefined;
+
+    if (item.WebClientReadFormQueryString) {
+        //According to https://msdn.microsoft.com/en-us/library/microsoft.exchange.webservices.data.item.webclientreadformquerystring(v=exchg.80).aspx
+        webLink = `${item.Service.Url.Scheme}://${item.Service.Url.Host}/owa/${item.WebClientReadFormQueryString}`;
+    }
 
     //@ts-ignore
     if (item.Sensitivity !== "Normal") {
@@ -136,7 +143,8 @@ export function mapAppointmentToApiEvent(item: Appointment): OfficeApiEvent {
             body: (item.Body ? ({
                 contentType: EnumValues.getNameFromValue(BodyType, item.Body.BodyType),
                 content: item.Body.Text
-            }) : null)
+            }) : null),
+            webLink: webLink
         };
     }
 
