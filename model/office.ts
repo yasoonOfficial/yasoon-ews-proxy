@@ -31,6 +31,7 @@ export interface OfficeApiEvent {
     webLink?: string;
     senderName?: string;
     singleValueExtendedProperties?: SingleValueExtendedProperty[];
+    seriesMasterId?: string;
 }
 
 

@@ -12,6 +12,7 @@ export interface UpdateUserCalendarEventParams {
     email: string;
     calendarId: string;
     eventId: string;
+    entireSeries: boolean;
 }
 
 export class UpdateEventRequest {
@@ -22,7 +23,13 @@ export class UpdateEventRequest {
         applyCredentials(service, env);
 
         let rawEvent: OfficeApiEvent = payload;
-        let appointment = await Appointment.Bind(service, new ItemId(params.eventId));
+        let appointment: Appointment;
+        if (params.entireSeries) {
+            appointment = await Appointment.BindToRecurringMaster(service, new ItemId(params.eventId));
+        } else {
+            appointment = await Appointment.Bind(service, new ItemId(params.eventId));
+        }
+
         copyApiEventToAppointment(rawEvent, appointment);
 
         let mode: SendInvitationsOrCancellationsMode = SendInvitationsOrCancellationsMode.SendToNone;

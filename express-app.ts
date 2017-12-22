@@ -126,7 +126,8 @@ app.patch('/user/:email/calendars/:id/events/:eventId', requestWrapper(async (re
     await updateEvent.execute(getEnvFromHeader(req, secret), {
         calendarId: req.params.id,
         email: req.params.email,
-        eventId: req.params.eventId
+        eventId: req.params.eventId,
+        entireSeries: req.query.entireSeries === 'true'
     }, req.body);
 
     res.status(200).send({});

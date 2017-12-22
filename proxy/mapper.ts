@@ -2,7 +2,7 @@ import * as moment from 'moment-timezone';
 import * as xmlEscape from 'xml-escape';
 
 import { OfficeApiEvent, EventAvailability } from "../model/office";
-import { Appointment, BodyType, MessageBody, StringList, DateTime, DateTimeKind, AttendeeCollection, MeetingResponseType, LegacyFreeBusyStatus, TimeZoneInfo } from "ews-javascript-api";
+import { Appointment, BodyType, MessageBody, StringList, DateTime, DateTimeKind, AttendeeCollection, MeetingResponseType, LegacyFreeBusyStatus, TimeZoneInfo, AppointmentType } from "ews-javascript-api";
 import { EnumValues } from "enum-values/src/enumValues";
 
 export function copyApiEventToAppointment(rawEvent: OfficeApiEvent, appointment: Appointment) {
@@ -128,6 +128,7 @@ export function mapAppointmentToApiEvent(item: Appointment): OfficeApiEvent {
                 }
             }) : null),
             type: getAppointmentType(<any>item.AppointmentType),
+            seriesMasterId: (item.AppointmentType === AppointmentType.Occurrence || item.AppointmentType === AppointmentType.Exception) ? "masterFor:" + item.Id.UniqueId : null,
             isReminderOn: item.IsReminderSet,
             reminderMinutesBeforeStart: (item.IsReminderSet) ? item.ReminderMinutesBeforeStart : undefined,
             attendees: all,
