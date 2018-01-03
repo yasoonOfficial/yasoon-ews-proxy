@@ -1,6 +1,5 @@
 import * as moment from 'moment-timezone';
 import * as xmlEscape from 'xml-escape';
-import * as url from 'url';
 
 import { OfficeApiEvent, EventAvailability } from "../model/office";
 import { Appointment, BodyType, MessageBody, StringList, DateTime, DateTimeKind, AttendeeCollection, MeetingResponseType, LegacyFreeBusyStatus, TimeZoneInfo, AppointmentType } from "ews-javascript-api";

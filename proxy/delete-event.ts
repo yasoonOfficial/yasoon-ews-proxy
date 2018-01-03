@@ -1,6 +1,6 @@
 import { Environment } from "model/proxy";
 import {
-    ExchangeService, Uri, DeleteMode, SendCancellationsMode, AffectedTaskOccurrence, ExchangeVersion, ItemId, Appointment, MessageBody
+    ExchangeService, Uri, DeleteMode, SendCancellationsMode, ExchangeVersion, ItemId, Appointment, MessageBody
 } from "ews-javascript-api";
 import { applyCredentials } from "../proxy/helper";
 
