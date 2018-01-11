@@ -10,16 +10,16 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var ExchangeService_1 = require("../node_modules/ews-javascript-api/js/Core/ExchangeService");
-var AutodiscoverLocalException_1 = require("../node_modules/ews-javascript-api/js/Exceptions/AutodiscoverLocalException");
+var ExchangeService_1 = require("ews-javascript-api/js/Core/ExchangeService");
+var AutodiscoverLocalException_1 = require("ews-javascript-api/js/Exceptions/AutodiscoverLocalException");
 var AutodiscoverService_1 = require("./CustomAutodiscoverService");
-var AutodiscoverErrorCode_1 = require("../node_modules/ews-javascript-api/js/Enumerations/AutodiscoverErrorCode");
-var ServiceErrorHandling_1 = require("../node_modules/ews-javascript-api/js/Enumerations/ServiceErrorHandling");
-var ServiceLocalException_1 = require("../node_modules/ews-javascript-api/js/Exceptions/ServiceLocalException");
-var ServiceRemoteException_1 = require("../node_modules/ews-javascript-api/js/Exceptions/ServiceRemoteException");
-var Strings_1 = require("../node_modules/ews-javascript-api/js/Strings");
-var ExtensionMethods_1 = require("../node_modules/ews-javascript-api/js/ExtensionMethods");
-var UserSettingName_1 = require("../node_modules/ews-javascript-api/js/Enumerations/UserSettingName");
+var AutodiscoverErrorCode_1 = require("ews-javascript-api/js/Enumerations/AutodiscoverErrorCode");
+var ServiceErrorHandling_1 = require("ews-javascript-api/js/Enumerations/ServiceErrorHandling");
+var ServiceLocalException_1 = require("ews-javascript-api/js/Exceptions/ServiceLocalException");
+var ServiceRemoteException_1 = require("ews-javascript-api/js/Exceptions/ServiceRemoteException");
+var Strings_1 = require("ews-javascript-api/js/Strings");
+var ExtensionMethods_1 = require("ews-javascript-api/js/ExtensionMethods");
+var UserSettingName_1 = require("ews-javascript-api/js/Enumerations/UserSettingName");
 
 /**
  * Represents a binding to the **Exchange Web Services**.

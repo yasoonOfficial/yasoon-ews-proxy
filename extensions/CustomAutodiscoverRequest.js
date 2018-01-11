@@ -1,18 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var AutodiscoverErrorCode_1 = require("../node_modules/ews-javascript-api/js/Enumerations/AutodiscoverErrorCode");
-var EwsLogging_1 = require("../node_modules/ews-javascript-api/js/Core/EwsLogging");
-var EwsServiceXmlWriter_1 = require("../node_modules/ews-javascript-api/js/Core/EwsServiceXmlWriter");
-var EwsUtilities_1 = require("../node_modules/ews-javascript-api/js/Core/EwsUtilities");
-var EwsXmlReader_1 = require("../node_modules/ews-javascript-api/js/Core/EwsXmlReader");
-var ExchangeServerInfo_1 = require("../node_modules/ews-javascript-api/js/Core/ExchangeServerInfo");
-var ExchangeVersion_1 = require("../node_modules/ews-javascript-api/js/Enumerations/ExchangeVersion");
-var Promise_1 = require("../node_modules/ews-javascript-api/js/Promise");
-var ServiceResponse_1 = require("../node_modules/ews-javascript-api/js/Core/Responses/ServiceResponse");
-var ServiceResponseException_1 = require("../node_modules/ews-javascript-api/js/Exceptions/ServiceResponseException");
-var SoapFaultDetails_1 = require("../node_modules/ews-javascript-api/js/Misc/SoapFaultDetails");
-var XmlElementNames_1 = require("../node_modules/ews-javascript-api/js/Core/XmlElementNames");
-var XmlNamespace_1 = require("../node_modules/ews-javascript-api/js/Enumerations/XmlNamespace");
+var AutodiscoverErrorCode_1 = require("ews-javascript-api/js/Enumerations/AutodiscoverErrorCode");
+var EwsLogging_1 = require("ews-javascript-api/js/Core/EwsLogging");
+var EwsServiceXmlWriter_1 = require("ews-javascript-api/js/Core/EwsServiceXmlWriter");
+var EwsUtilities_1 = require("ews-javascript-api/js/Core/EwsUtilities");
+var EwsXmlReader_1 = require("ews-javascript-api/js/Core/EwsXmlReader");
+var ExchangeServerInfo_1 = require("ews-javascript-api/js/Core/ExchangeServerInfo");
+var ExchangeVersion_1 = require("ews-javascript-api/js/Enumerations/ExchangeVersion");
+var Promise_1 = require("ews-javascript-api/js/Promise");
+var ServiceResponse_1 = require("ews-javascript-api/js/Core/Responses/ServiceResponse");
+var ServiceResponseException_1 = require("ews-javascript-api/js/Exceptions/ServiceResponseException");
+var SoapFaultDetails_1 = require("ews-javascript-api/js/Misc/SoapFaultDetails");
+var XmlElementNames_1 = require("ews-javascript-api/js/Core/XmlElementNames");
+var XmlNamespace_1 = require("ews-javascript-api/js/Enumerations/XmlNamespace");
 var AutodiscoverRequest = (function () {
     function AutodiscoverRequest(service, url) {
         this.url = null;

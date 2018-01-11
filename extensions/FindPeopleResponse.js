@@ -10,10 +10,10 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var XmlElementNames_1 = require("../node_modules/ews-javascript-api/js/Core/XmlElementNames");
-var XmlAttributeNames_1 = require("../node_modules/ews-javascript-api/js/Core/XmlAttributeNames");
-var ServiceResponse_1 = require("../node_modules/ews-javascript-api/js/Core/Responses/ServiceResponse");
-var EwsServiceJsonReader_1 = require("../node_modules/ews-javascript-api/js/Core/EwsServiceJsonReader");
+var XmlElementNames_1 = require("ews-javascript-api/js/Core/XmlElementNames");
+var XmlAttributeNames_1 = require("ews-javascript-api/js/Core/XmlAttributeNames");
+var ServiceResponse_1 = require("ews-javascript-api/js/Core/Responses/ServiceResponse");
+var EwsServiceJsonReader_1 = require("ews-javascript-api/js/Core/EwsServiceJsonReader");
 
 var FindPeopleResponse = (function (_super) {
     __extends(FindPeopleResponse, _super);

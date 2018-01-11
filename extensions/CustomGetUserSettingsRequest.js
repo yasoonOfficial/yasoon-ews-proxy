@@ -10,13 +10,13 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var Strings_1 = require("../node_modules/ews-javascript-api/js/Strings");
-var XmlElementNames_1 = require("../node_modules/ews-javascript-api/js/Core/XmlElementNames");
-var EwsUtilities_1 = require("../node_modules/ews-javascript-api/js/Core/EwsUtilities");
-var XmlNamespace_1 = require("../node_modules/ews-javascript-api/js/Enumerations/XmlNamespace");
-var UserSettingName_1 = require("../node_modules/ews-javascript-api/js/Enumerations/UserSettingName");
-var ServiceValidationException_1 = require("../node_modules/ews-javascript-api/js/Exceptions/ServiceValidationException");
-var GetUserSettingsResponseCollection_1 = require("../node_modules/ews-javascript-api/js/Autodiscover/Responses/GetUserSettingsResponseCollection");
+var Strings_1 = require("ews-javascript-api/js/Strings");
+var XmlElementNames_1 = require("ews-javascript-api/js/Core/XmlElementNames");
+var EwsUtilities_1 = require("ews-javascript-api/js/Core/EwsUtilities");
+var XmlNamespace_1 = require("ews-javascript-api/js/Enumerations/XmlNamespace");
+var UserSettingName_1 = require("ews-javascript-api/js/Enumerations/UserSettingName");
+var ServiceValidationException_1 = require("ews-javascript-api/js/Exceptions/ServiceValidationException");
+var GetUserSettingsResponseCollection_1 = require("ews-javascript-api/js/Autodiscover/Responses/GetUserSettingsResponseCollection");
 var AutodiscoverRequest_1 = require("./CustomAutodiscoverRequest");
 var GetUserSettingsRequest = (function (_super) {
     __extends(GetUserSettingsRequest, _super);

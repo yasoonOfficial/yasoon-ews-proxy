@@ -10,11 +10,11 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var ExchangeVersion_1 = require("../node_modules/ews-javascript-api/js/Enumerations/ExchangeVersion");
-var FindItemResponse_1 = require("../node_modules/ews-javascript-api/js/Core/Responses/FindItemResponse");
-var XmlElementNames_1 = require("../node_modules/ews-javascript-api/js/Core/XmlElementNames");
-var SimpleServiceRequestBase_1 = require("../node_modules/ews-javascript-api/js/Core/Requests/SimpleServiceRequestBase");
-var XmlNamespace_1 = require("../node_modules/ews-javascript-api/js/Enumerations/XmlNamespace");
+var ExchangeVersion_1 = require("ews-javascript-api/js/Enumerations/ExchangeVersion");
+var FindItemResponse_1 = require("ews-javascript-api/js/Core/Responses/FindItemResponse");
+var XmlElementNames_1 = require("ews-javascript-api/js/Core/XmlElementNames");
+var SimpleServiceRequestBase_1 = require("ews-javascript-api/js/Core/Requests/SimpleServiceRequestBase");
+var XmlNamespace_1 = require("ews-javascript-api/js/Enumerations/XmlNamespace");
 var GetUserPhotoResponse_1 = require('./GetUserPhotoResponse');
 
 /**

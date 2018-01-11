@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 
-var TimeZonePropertyDefinition_1 = require("../node_modules/ews-javascript-api/js/PropertyDefinitions/TimeZonePropertyDefinition");
-var TimeZoneDefinition_1 = require("../node_modules/ews-javascript-api/js/ComplexProperties/TimeZones/TimeZoneDefinition");
+var TimeZonePropertyDefinition_1 = require("ews-javascript-api/js/PropertyDefinitions/TimeZonePropertyDefinition");
+var TimeZoneDefinition_1 = require("ews-javascript-api/js/ComplexProperties/TimeZones/TimeZoneDefinition");
 
 var Monkey = (function (_super) {
     function Monkey() {
