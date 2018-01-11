@@ -1,6 +1,6 @@
 {
-	"name": "yasoon-ews-proxy",
-	"version": "1.0.0",
+	"name": "@yasoon/yasoon-ews-proxy",
+	"version": "1.2.0",
 	"description": "",
 	"main": "app.js",
 	"scripts": {

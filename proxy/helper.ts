@@ -20,7 +20,7 @@ export function applyCredentials(service: any, env: Environment) {
             password = new Buffer(env.ewsPassword, 'base64').toString();
         }
 
-        service.XHRApi = new ntlmAuthXhrApi(userEmail, password);
+        service.XHRApi = new ntlmAuthXhrApi(userEmail, password, true);
         service.UseDefaultCredentials = true; //Bug... 
     } else if (env.ewsUser && env.ewsPassword) {
         let userEmail = env.ewsUser;
