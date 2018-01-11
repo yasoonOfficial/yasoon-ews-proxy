@@ -1,0 +1,14 @@
+.vscode/*
+/node_modules
+/extensions
+/model
+/proxy
+/res
+/app-local.js
+/app.js
+/express-app.ts
+/lambda-app.ts
+/yarn.lock
+/dist
+/index.ts
+/tsconfig.json

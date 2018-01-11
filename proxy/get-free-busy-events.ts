@@ -1,6 +1,6 @@
 import * as moment from 'moment-timezone';
 
-import { Environment } from "model/proxy";
+import { Environment } from "../model/proxy";
 import {
     ExchangeService, Uri, ExchangeVersion, TimeZoneInfo,
     AttendeeInfo, DateTime, AvailabilityOptions, FreeBusyViewType,
@@ -8,7 +8,7 @@ import {
 } from "ews-javascript-api";
 import { applyCredentials } from "../proxy/helper";
 import { getFreeBusyStatusNewName, getFreeBusyStatusLabel } from '../proxy/mapper';
-import { OfficeApiEvent } from 'model/office';
+import { OfficeApiEvent } from '../model/office';
 
 export interface GetFreeBusyEventsParams {
     email: string;

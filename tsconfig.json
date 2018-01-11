@@ -10,7 +10,6 @@
         "allowJs": true,
         "forceConsistentCasingInFileNames": true,
         "noUnusedLocals": true,
-        "baseUrl": "./",
         "outDir": "./dist"
     },
     "include": [

@@ -1,4 +1,4 @@
-import { Environment } from "model/proxy";
+import { Environment } from "../model/proxy";
 import {
     ExchangeService, Uri, FolderId, WellKnownFolderName,
     Mailbox, Appointment, ExchangeVersion, TimeZoneInfo,
@@ -6,7 +6,7 @@ import {
 } from "ews-javascript-api";
 import { applyCredentials } from "../proxy/helper";
 import { copyApiEventToAppointment } from '../proxy/mapper';
-import { OfficeApiEvent } from 'model/office';
+import { OfficeApiEvent } from '../model/office';
 
 export interface CreateEventParams {
     email: string;

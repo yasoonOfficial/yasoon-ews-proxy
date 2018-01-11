@@ -1,4 +1,4 @@
-import { Environment } from "model/proxy";
+import { Environment } from "../model/proxy";
 import {
     ExchangeService, Uri, DeleteMode, SendCancellationsMode, ExchangeVersion, ItemId, Appointment, MessageBody
 } from "ews-javascript-api";

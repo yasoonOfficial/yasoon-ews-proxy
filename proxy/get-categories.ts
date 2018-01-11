@@ -1,8 +1,8 @@
-import { Environment } from "model/proxy";
+import { Environment } from "../model/proxy";
 import { ExchangeService, Uri, FolderId, WellKnownFolderName, Mailbox, ExchangeVersion, UserConfigurationProperties } from "ews-javascript-api";
 import { applyCredentials } from "../proxy/helper";
 import { parseString } from "xml2js";
-import { XmlCategoriesResult } from "model/office";
+import { XmlCategoriesResult } from "../model/office";
 
 export class GetCategoriesRequest {
 

@@ -1,4 +1,4 @@
-import { Environment } from "model/proxy";
+import { Environment } from "../model/proxy";
 import { applyCredentials, getCredentialsAsAuth, validateAutodiscoverRedirection } from "../proxy/helper";
 import { AutodiscoverService, GetUserSettingsResponse, UserSettingName } from "ews-javascript-api";
 import { AutodiscoverService as NtlmAutodiscoverService } from '../extensions/CustomAutodiscoverService';

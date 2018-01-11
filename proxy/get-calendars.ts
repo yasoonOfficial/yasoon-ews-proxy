@@ -1,4 +1,4 @@
-import { Environment } from "model/proxy";
+import { Environment } from "../model/proxy";
 import { ExchangeService, Uri, FolderId, WellKnownFolderName, Mailbox, FolderView, BasePropertySet, PropertySet, FolderSchema, ExchangeVersion } from "ews-javascript-api";
 import { applyCredentials, getAccessArrayFromEffectiveRights } from "../proxy/helper";
 

@@ -1,6 +1,6 @@
 import { WebCredentials, OAuthCredentials, SoapFaultDetails, EffectiveRights } from "ews-javascript-api";
 import { ntlmAuthXhrApi } from "../extensions/CustomNtlmAuthXhrApi";
-import { Environment } from "model/proxy";
+import { Environment } from "../model/proxy";
 import { EWS_AUTH_TYPE_HEADER, EWS_PASSWORD_HEADER, EWS_TOKEN_HEADER, EWS_URL_HEADER, EWS_USER_HEADER, EWS_URL_OFFICE_365, PROXY_SECRET_HEADER } from "../model/constants";
 
 import * as express from 'express';

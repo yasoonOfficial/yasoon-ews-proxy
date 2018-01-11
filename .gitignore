@@ -37,12 +37,18 @@ jspm_packages
 .node_repl_history
 
 *.map
-
-# Elastic Beanstalk Files
-.elasticbeanstalk/*
-!.elasticbeanstalk/*.cfg.yml
-!.elasticbeanstalk/*.global.yml
+
+
+# Elastic Beanstalk Files
+
+.elasticbeanstalk/*
+
+!.elasticbeanstalk/*.cfg.yml
+
+!.elasticbeanstalk/*.global.yml
+
 /dist/*
 /res/ResourceHacker.ini
 /res/res.res
 /.vscode/*
+lib

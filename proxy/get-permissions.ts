@@ -1,4 +1,4 @@
-import { Environment } from "model/proxy";
+import { Environment } from "../model/proxy";
 import {
     ExchangeService, Uri, ExchangeVersion, TimeZoneInfo,
     AttendeeInfo, DateTime, TimeWindow, AvailabilityData,
