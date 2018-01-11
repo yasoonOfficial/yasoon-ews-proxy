@@ -4,6 +4,7 @@ import { Environment } from "../model/proxy";
 import { ExchangeService, Uri, FolderId, WellKnownFolderName, Mailbox, BasePropertySet, PropertySet, DateTime, CalendarView, AppointmentSchema, Appointment, ExchangeVersion, TimeZoneInfo } from "ews-javascript-api";
 import { applyCredentials } from "../proxy/helper";
 import { mapAppointmentToApiEvent } from '../proxy/mapper';
+import { OfficeApiEvent } from '../model/office';
 
 export interface GetEventsParams {
     email: string;
@@ -50,7 +51,7 @@ export class GetEventsRequest {
 
             let itemResponse = await service.BindToItems(ewsResult.Items.map(i => i.Id), PropertySet.FirstClassProperties);
 
-            let responseArray = [];
+            let responseArray: OfficeApiEvent[] = [];
             for (let i = 0; i < itemResponse.Responses.length; i++) {
                 let item: Appointment = <Appointment>itemResponse.Responses[i].Item;
 

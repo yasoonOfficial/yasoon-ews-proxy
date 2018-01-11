@@ -15,3 +15,7 @@ export * from './proxy/search-user';
 export * from './proxy/mapper';
 export * from './proxy/helper';
 export * from './proxy/update-event';
+
+export * from './model/constants';
+export * from './model/office';
+export * from './model/proxy';
