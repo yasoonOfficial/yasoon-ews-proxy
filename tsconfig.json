@@ -17,6 +17,7 @@
         "./node_modules/ews-javascript-api/typings/ExchangeWebService.d.ts",
         "./express-app.ts",
         "./lambda-app.ts",
+        "./index.ts",
         "./model/**/*",
         "./proxy/**/*",
         "./extensions/**/*"
