@@ -87,7 +87,12 @@ export function mapAppointmentToApiEvent(item: Appointment): OfficeApiEvent {
 
     if (item.WebClientReadFormQueryString) {
         //According to https://msdn.microsoft.com/en-us/library/microsoft.exchange.webservices.data.item.webclientreadformquerystring(v=exchg.80).aspx
-        webLink = `${item.Service.Url.Scheme}://${item.Service.Url.Host}/owa/${item.WebClientReadFormQueryString}`;
+        if (item.WebClientReadFormQueryString.indexOf('http') === 0) {
+            webLink = item.WebClientReadFormQueryString;
+        }
+        else {
+            webLink = `${item.Service.Url.Scheme}://${item.Service.Url.Host}/owa/${item.WebClientReadFormQueryString}`;
+        }
     }
 
     //@ts-ignore
