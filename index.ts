@@ -1,3 +1,8 @@
+import { Monkey } from './extensions/Monkey';
+
+//Fix for https://github.com/gautamsi/ews-javascript-api/pull/219
+new Monkey().patch();
+
 export * from './proxy/create-calendar';
 export * from './proxy/create-event';
 export * from './proxy/create-wunderbar-link';
