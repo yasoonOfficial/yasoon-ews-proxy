@@ -49,7 +49,8 @@ export class GetEventsRequest {
             if (ewsResult.Items.length === 0)
                 return [];
 
-            let itemResponse = await service.BindToItems(ewsResult.Items.map(i => i.Id), PropertySet.FirstClassProperties);
+            let props = new PropertySet(BasePropertySet.FirstClassProperties, AppointmentSchema.StartTimeZone);
+            let itemResponse = await service.BindToItems(ewsResult.Items.map(i => i.Id), props);
 
             let responseArray: OfficeApiEvent[] = [];
             for (let i = 0; i < itemResponse.Responses.length; i++) {

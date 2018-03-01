@@ -25,8 +25,7 @@ export function copyApiEventToAppointment(rawEvent: OfficeApiEvent, appointment:
             bodyType = BodyType.HTML;
 
         //#shitty api
-        if (bodyType === BodyType.HTML)
-            rawEvent.body.content = xmlEscape(rawEvent.body.content);
+        rawEvent.body.content = xmlEscape(rawEvent.body.content);
 
         appointment.Body = new MessageBody(bodyType, rawEvent.body.content);
     }
@@ -41,11 +40,11 @@ export function copyApiEventToAppointment(rawEvent: OfficeApiEvent, appointment:
     }
 
     if (rawEvent.location) {
-        appointment.Location = rawEvent.location ? rawEvent.location.displayName : '';
+        appointment.Location = rawEvent.location ? xmlEscape(rawEvent.location.displayName) : '';
     }
 
     if (rawEvent.subject) {
-        appointment.Subject = rawEvent.subject;
+        appointment.Subject = xmlEscape(rawEvent.subject);
     }
 
     if (rawEvent.isAllDay !== undefined) {
