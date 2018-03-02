@@ -1,7 +1,7 @@
 import * as moment from 'moment-timezone';
 
 import { Environment } from "../model/proxy";
-import { ExchangeService, Uri, FolderId, WellKnownFolderName, Mailbox, BasePropertySet, PropertySet, DateTime, CalendarView, AppointmentSchema, Appointment, ExchangeVersion, TimeZoneInfo } from "ews-javascript-api";
+import { ExchangeService, Uri, FolderId, WellKnownFolderName, Mailbox, BasePropertySet, PropertySet, DateTime, CalendarView, AppointmentSchema, Appointment, ExchangeVersion, TimeZoneInfo, PropertyDefinitionBase } from "ews-javascript-api";
 import { applyCredentials } from "../proxy/helper";
 import { mapAppointmentToApiEvent } from '../proxy/mapper';
 import { OfficeApiEvent } from '../model/office';
@@ -11,6 +11,7 @@ export interface GetEventsParams {
     calendarId: string;
     startDate: string;
     endDate: string;
+    additionalProperties?: PropertyDefinitionBase[];
 }
 
 export class GetEventsRequest {
@@ -35,13 +36,16 @@ export class GetEventsRequest {
 
         let calendarView = new CalendarView(start, end);
         calendarView.MaxItemsReturned = 250;
+
+        params.additionalProperties = params.additionalProperties || [];
         calendarView.PropertySet = new PropertySet(
             BasePropertySet.IdOnly,
             AppointmentSchema.Sensitivity,
             AppointmentSchema.Start,
             AppointmentSchema.End,
             AppointmentSchema.IsAllDayEvent,
-            AppointmentSchema.LegacyFreeBusyStatus
+            AppointmentSchema.LegacyFreeBusyStatus,
+            ...params.additionalProperties
         );
 
         try {
