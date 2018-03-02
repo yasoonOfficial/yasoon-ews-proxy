@@ -2,7 +2,7 @@ import * as moment from 'moment-timezone';
 import * as xmlEscape from 'xml-escape';
 
 import { OfficeApiEvent, EventAvailability } from "../model/office";
-import { Appointment, BodyType, MessageBody, StringList, DateTime, DateTimeKind, AttendeeCollection, MeetingResponseType, LegacyFreeBusyStatus, TimeZoneInfo, AppointmentType, PropertyDefinitionBase, ExtendedProperty, ExtendedPropertyDefinition } from "ews-javascript-api";
+import { Appointment, BodyType, MessageBody, StringList, DateTime, DateTimeKind, AttendeeCollection, MeetingResponseType, LegacyFreeBusyStatus, TimeZoneInfo, AppointmentType, PropertyDefinitionBase, ExtendedProperty, ExtendedPropertyDefinition, IOutParam } from "ews-javascript-api";
 import { EnumValues } from "enum-values/src/enumValues";
 
 export function copyApiEventToAppointment(rawEvent: OfficeApiEvent, appointment: Appointment) {
@@ -154,9 +154,12 @@ export function mapAppointmentToApiEvent(item: Appointment, additionalProps?: Pr
     if (additionalProps && additionalProps.length > 0) {
         additionalProps.forEach(prop => {
             if (prop instanceof ExtendedPropertyDefinition) {
-                let outValue = null;
-                item.TryGetProperty(prop, outValue);
-                result[prop.Name] = outValue;
+                let outParam: IOutParam<any> = {
+                    outValue: null
+                };
+
+                item.TryGetProperty<any>(prop, outParam);
+                result[prop.Name] = outParam.outValue;
             }
         });
     }
