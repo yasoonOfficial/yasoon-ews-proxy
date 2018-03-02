@@ -37,14 +37,14 @@ export class GetEventsRequest {
         let calendarView = new CalendarView(start, end);
         calendarView.MaxItemsReturned = 250;
 
-        params.additionalProperties = params.additionalProperties || [];
-        params.additionalProperties.push(AppointmentSchema.Sensitivity);
-        params.additionalProperties.push(AppointmentSchema.Start);
-        params.additionalProperties.push(AppointmentSchema.End);
-        params.additionalProperties.push(AppointmentSchema.IsAllDayEvent);
-        params.additionalProperties.push(AppointmentSchema.LegacyFreeBusyStatus);
+        let additionalProperties = params.additionalProperties || [];
+        additionalProperties.push(AppointmentSchema.Sensitivity);
+        additionalProperties.push(AppointmentSchema.Start);
+        additionalProperties.push(AppointmentSchema.End);
+        additionalProperties.push(AppointmentSchema.IsAllDayEvent);
+        additionalProperties.push(AppointmentSchema.LegacyFreeBusyStatus);
 
-        calendarView.PropertySet = new PropertySet(BasePropertySet.IdOnly, params.additionalProperties);
+        calendarView.PropertySet = new PropertySet(BasePropertySet.IdOnly, additionalProperties);
 
         try {
             let ewsResult = await service.FindAppointments(ewsFolder, calendarView);
@@ -62,10 +62,10 @@ export class GetEventsRequest {
                 if (!item) {
                     //@ts-ignore
                     if (ewsResult.Items[i] && ewsResult.Items[i].Sensitivity !== "Normal") {
-                        responseArray.push(mapAppointmentToApiEvent(ewsResult.Items[i]));
+                        responseArray.push(mapAppointmentToApiEvent(ewsResult.Items[i], params.additionalProperties));
                     }
                 } else {
-                    responseArray.push(mapAppointmentToApiEvent(item));
+                    responseArray.push(mapAppointmentToApiEvent(item, params.additionalProperties));
                 }
             }
 
