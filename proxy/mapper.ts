@@ -159,7 +159,7 @@ export function mapAppointmentToApiEvent(item: Appointment, additionalProps?: Pr
                 };
 
                 item.TryGetProperty<any>(prop, outParam);
-                result[prop.Name] = outParam.outValue;
+                result[prop.Name[0].toLowerCase() + prop.Name.substring(1)] = outParam.outValue;
             }
         });
     }
