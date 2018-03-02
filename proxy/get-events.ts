@@ -38,15 +38,13 @@ export class GetEventsRequest {
         calendarView.MaxItemsReturned = 250;
 
         params.additionalProperties = params.additionalProperties || [];
-        calendarView.PropertySet = new PropertySet(
-            BasePropertySet.IdOnly,
-            AppointmentSchema.Sensitivity,
-            AppointmentSchema.Start,
-            AppointmentSchema.End,
-            AppointmentSchema.IsAllDayEvent,
-            AppointmentSchema.LegacyFreeBusyStatus,
-            ...params.additionalProperties
-        );
+        params.additionalProperties.push(AppointmentSchema.Sensitivity);
+        params.additionalProperties.push(AppointmentSchema.Start);
+        params.additionalProperties.push(AppointmentSchema.End);
+        params.additionalProperties.push(AppointmentSchema.IsAllDayEvent);
+        params.additionalProperties.push(AppointmentSchema.LegacyFreeBusyStatus);
+
+        calendarView.PropertySet = new PropertySet(BasePropertySet.IdOnly, params.additionalProperties);
 
         try {
             let ewsResult = await service.FindAppointments(ewsFolder, calendarView);
