@@ -59,17 +59,19 @@ export function copyApiEventToAppointment(rawEvent: OfficeApiEvent, appointment:
     }
 
     if (rawEvent.start) {
-        let mDate = moment.tz(rawEvent.start.dateTime as string, rawEvent.start.timeZone);
+        let startTimezone = TimeZoneInfo.FindSystemTimeZoneById(rawEvent.start.timeZone);
+        let mDate = moment.tz(rawEvent.start.dateTime as string, startTimezone.IanaId);
         appointment.Start = new DateTime(mDate);
         appointment.Start.kind = DateTimeKind.Unspecified;
-        appointment.StartTimeZone = TimeZoneInfo.FindSystemTimeZoneById(rawEvent.start.timeZone);
+        appointment.StartTimeZone = startTimezone;
     }
 
     if (rawEvent.end) {
-        let mDate = moment.tz(rawEvent.end.dateTime as string, rawEvent.end.timeZone);
+        let endTimezone = TimeZoneInfo.FindSystemTimeZoneById(rawEvent.end.timeZone);
+        let mDate = moment.tz(rawEvent.end.dateTime as string, endTimezone.IanaId);
         appointment.End = new DateTime(mDate);
         appointment.End.kind = DateTimeKind.Unspecified;
-        appointment.EndTimeZone = TimeZoneInfo.FindSystemTimeZoneById(rawEvent.end.timeZone);
+        appointment.EndTimeZone = endTimezone;
     }
 }
 
