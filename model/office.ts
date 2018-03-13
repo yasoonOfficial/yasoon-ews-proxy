@@ -1,3 +1,5 @@
+import { DayOfTheWeek, DayOfTheWeekIndex } from "ews-javascript-api";
+
 export interface OfficeApiEvent {
     id?: string;
     calendarId?: string;
@@ -31,6 +33,10 @@ export interface OfficeApiEvent {
     webLink?: string;
     senderName?: string;
     singleValueExtendedProperties?: SingleValueExtendedProperty[];
+    recurrence?: {
+        pattern: RecurrencePattern;
+        range: RecurrenceRange;
+    };
     seriesMasterId?: string;
 }
 
@@ -94,4 +100,37 @@ export interface OfficeSharedMailbox {
 
 export enum EventAvailability {
     Busy = "busy", Free = "free", NoData = "unknown", Tentative = "tentative", OutOfOffice = "oof", WorkingElsewhere = "workingElsewhere"
+}
+
+export interface PatternedRecurrence {
+    pattern: RecurrencePattern
+    range: RecurrenceRange
+}
+
+export interface RecurrencePattern {
+    dayOfMonth?: number;
+    daysOfWeek?: DayOfTheWeek[];
+    firstDayOfWeek?: string;
+    index?: DayOfTheWeekIndex;
+    interval?: number;
+    month?: number;
+    type?: RecurrencePatternType;
+}
+
+export interface RecurrenceRange {
+    endDate?: string;    //"String (timestamp)"
+    numberOfOccurrences?: number;
+    recurrenceTimeZone?: string;
+    startDate?: string;  //"String (timestamp)"
+    type?: RecurrenceRangeType;
+}
+
+export enum RecurrencePatternType {
+    Daily = 'Daily', Weekly = 'Weekly', AbsoluteMonthly = 'AbsoluteMonthly',
+    RelativeMonthly = 'RelativeMonthly', AbsoluteYearly = 'AbsoluteYearly',
+    RelativeYearly = 'RelativeYearly'
+}
+
+export enum RecurrenceRangeType {
+    EndDate = 'EndDate', NoEnd = 'NoEnd', Numbered = 'Numbered'
 }

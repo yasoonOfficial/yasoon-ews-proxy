@@ -1,9 +1,10 @@
 import * as moment from 'moment-timezone';
 import * as xmlEscape from 'xml-escape';
 
-import { OfficeApiEvent, EventAvailability } from "../model/office";
-import { Appointment, BodyType, MessageBody, StringList, DateTime, DateTimeKind, AttendeeCollection, MeetingResponseType, LegacyFreeBusyStatus, TimeZoneInfo, AppointmentType, PropertyDefinitionBase, ExtendedProperty, ExtendedPropertyDefinition, IOutParam } from "ews-javascript-api";
+import { Appointment, BodyType, MessageBody, StringList, DateTime, DateTimeKind, AttendeeCollection, MeetingResponseType, LegacyFreeBusyStatus, TimeZoneInfo, AppointmentType, PropertyDefinitionBase, ExtendedPropertyDefinition, IOutParam, DayOfTheWeek, Recurrence, DayOfTheWeekIndex } from "ews-javascript-api";
+import { OfficeApiEvent, EventAvailability, RecurrencePatternType, RecurrenceRangeType } from "../model/office";
 import { EnumValues } from "enum-values/src/enumValues";
+//import { raw } from 'body-parser';
 
 export function copyApiEventToAppointment(rawEvent: OfficeApiEvent, appointment: Appointment) {
     //Let the mapping begin!
@@ -73,6 +74,49 @@ export function copyApiEventToAppointment(rawEvent: OfficeApiEvent, appointment:
         appointment.End.kind = DateTimeKind.Unspecified;
         appointment.EndTimeZone = endTimezone;
     }
+
+    if (rawEvent.recurrence) {
+        //Recurrence is not typed correctly....
+        if (rawEvent.recurrence.pattern) {
+            if (rawEvent.recurrence.pattern.type === RecurrencePatternType.Daily) {
+                //@ts-ignore
+                appointment.Recurrence = new Recurrence.DailyPattern(new DateTime(rawEvent.recurrence.range.startDate), rawEvent.recurrence.pattern.interval);
+            } else if (rawEvent.recurrence.pattern.type === RecurrencePatternType.Weekly) {
+                let daysOfWeekEnum = mapDaysOfTheWeek(rawEvent.recurrence.pattern.daysOfWeek);
+                //@ts-ignore
+                appointment.Recurrence = new Recurrence.WeeklyPattern(new DateTime(rawEvent.recurrence.range.startDate), rawEvent.recurrence.pattern.interval, daysOfWeekEnum);
+            } else if (rawEvent.recurrence.pattern.type === RecurrencePatternType.RelativeMonthly) {
+                //@ts-ignore
+                appointment.Recurrence = new Recurrence.RelativeMonthlyPattern(new DateTime(rawEvent.recurrence.range.startDate), rawEvent.recurrence.pattern.interval, DayOfTheWeek[rawEvent.recurrence.pattern.daysOfWeek[0]], DayOfTheWeekIndex[rawEvent.recurrence.pattern.index]);
+            } else if (rawEvent.recurrence.pattern.type === RecurrencePatternType.AbsoluteMonthly) {
+                //@ts-ignore
+                appointment.Recurrence = new Recurrence.MonthlyPattern(new DateTime(rawEvent.recurrence.startDate), rawEvent.recurrence.pattern.interval, rawEvent.recurrence.pattern.dayOfMonth);
+            } else if (rawEvent.recurrence.pattern.type === RecurrencePatternType.RelativeYearly) {
+                //@ts-ignore
+                appointment.Recurrence = new Recurrence.RelativeYearlyPattern(new DateTime(rawEvent.recurrence.range.startDate), rawEvent.recurrence.pattern.month, DayOfTheWeek[rawEvent.recurrence.pattern.daysOfWeek[0]], DayOfTheWeekIndex[rawEvent.recurrence.pattern.index]);
+            } else if (rawEvent.recurrence.pattern.type === RecurrencePatternType.AbsoluteYearly) {
+                //@ts-ignore
+                appointment.Recurrence = new Recurrence.YearlyPattern(new DateTime(rawEvent.recurrence.range.startDate), rawEvent.recurrence.pattern.month, rawEvent.recurrence.pattern.dayOfMonth);
+            }
+        }
+
+        if (rawEvent.recurrence.range) {
+            appointment.Recurrence.startDate = new DateTime(rawEvent.recurrence.range.startDate);
+            if (rawEvent.recurrence.range.type === RecurrenceRangeType.Numbered) {
+                appointment.Recurrence.numberOfOccurrences = rawEvent.recurrence.range.numberOfOccurrences;
+            } else if (rawEvent.recurrence.range.type === RecurrenceRangeType.EndDate) {
+                appointment.Recurrence.endDate = new DateTime(rawEvent.recurrence.range.endDate);
+            }
+        }
+    }
+}
+
+export function mapDaysOfTheWeek(daysOfWeek): DayOfTheWeek[] {
+    let daysOfWeekEnum = []
+    daysOfWeek.map((day) => {
+        daysOfWeekEnum.push(DayOfTheWeek[day]);
+    });
+    return daysOfWeekEnum;
 }
 
 export function mapAppointmentToApiEvent(item: Appointment, additionalProps?: PropertyDefinitionBase[]): OfficeApiEvent {
