@@ -6,6 +6,7 @@ new Monkey().patch();
 export * from './proxy/create-calendar';
 export * from './proxy/create-event';
 export * from './proxy/create-wunderbar-link';
+export * from './proxy/delete-calendar';
 export * from './proxy/delete-event';
 export * from './proxy/get-autodiscover-data';
 export * from './proxy/get-calendars';

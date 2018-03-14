@@ -19,6 +19,7 @@ import { EWS_AUTH_TYPE_HEADER, EWS_TOKEN_HEADER, EWS_URL_HEADER, EWS_USER_HEADER
 import { DeleteEventRequest } from './proxy/delete-event';
 import { GetCategoriesRequest } from './proxy/get-categories';
 import { Monkey } from './extensions/Monkey';
+import { DeleteCalendarRequest } from './proxy/delete-calendar';
 
 const customHeaders = [
     EWS_AUTH_TYPE_HEADER,
@@ -186,6 +187,15 @@ app.post('/user/:email/calendars/:id/events/:eventId/delete', requestWrapper(asy
         type: req.body.type
     });
     res.status(200).send({});
+}));
+
+app.delete('/user/:email/calendars/:id/delete', requestWrapper(async (req: express.Request, res: express.Response) => {
+    let deleteRequest = new DeleteCalendarRequest();
+    await deleteRequest.execute(getEnvFromHeader(req, secret), {
+        calendarId: req.params.id,
+        email: req.params.email
+    });
+    res.status(204).send({});
 }));
 
 export = app;
