@@ -22,7 +22,7 @@ export class CreateEventRequest {
 
         let rawEvent: OfficeApiEvent = payload;
         if (!rawEvent.subject || !rawEvent.start || !rawEvent.end)
-            throw Error('Missing data');
+            throw new Error('Missing data');
 
         let targetFolderId: FolderId = null;
         let mode: SendInvitationsMode = SendInvitationsMode.SendToNone;

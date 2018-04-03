@@ -79,10 +79,6 @@ export function mapAppointmentToApiEvent(item: Appointment, additionalProps?: Pr
     if (!item)
         return null;
 
-    let attendees = mapAttendees(item.RequiredAttendees, "Required");
-    let withOptional = attendees.concat(mapAttendees(item.OptionalAttendees, "Optional"));
-    let all = withOptional.concat(mapAttendees(item.Resources, "Resource"));
-
     let result: OfficeApiEvent = null;
     let webLink: string = undefined;
 
@@ -116,6 +112,11 @@ export function mapAppointmentToApiEvent(item: Appointment, additionalProps?: Pr
             showAs: getFreeBusyStatusNewName(LegacyFreeBusyStatus[item.LegacyFreeBusyStatus])
         };
     } else {
+
+        let attendees = mapAttendees(item.RequiredAttendees, "Required");
+        let withOptional = attendees.concat(mapAttendees(item.OptionalAttendees, "Optional"));
+        let all = withOptional.concat(mapAttendees(item.Resources, "Resource"));
+
         result = {
             id: item.Id.UniqueId,
             calendarId: (item.ParentFolderId ? item.ParentFolderId.UniqueId : ''),
