@@ -1,5 +1,5 @@
 import { Environment } from "../model/proxy";
-import { ExchangeService, Uri, FolderId, WellKnownFolderName, Mailbox, AppointmentSchema, ExchangeVersion, TimeZoneInfo, PropertyDefinitionBase, PropertySet, BasePropertySet, ItemId, Appointment } from "ews-javascript-api";
+import { ExchangeService, Uri, FolderId, WellKnownFolderName, Mailbox, ExchangeVersion, TimeZoneInfo, PropertyDefinitionBase, ItemId, Appointment } from "ews-javascript-api";
 import { applyCredentials } from "../proxy/helper";
 import { mapAppointmentToApiEvent } from "..";
 
@@ -30,25 +30,12 @@ export class GetSingleCalendarEventRequest {
         }
 
         try {
-            let itemProps = new PropertySet(BasePropertySet.FirstClassProperties,
-                AppointmentSchema.StartTimeZone, AppointmentSchema.EndTimeZone);
-
-            let itemId = [new ItemId(eventId)];
-
-            let itemResponse = await service.BindToItems(itemId, itemProps);
-            let item: Appointment = <Appointment>itemResponse.Responses[0].Item;
+            let item = await Appointment.Bind(service, new ItemId(eventId));
 
             if (item == null)
                 return null;
 
-            let additionalProperties = [];
-            additionalProperties.push(AppointmentSchema.Sensitivity);
-            additionalProperties.push(AppointmentSchema.Start);
-            additionalProperties.push(AppointmentSchema.End);
-            additionalProperties.push(AppointmentSchema.IsAllDayEvent);
-            additionalProperties.push(AppointmentSchema.LegacyFreeBusyStatus);
-
-            return mapAppointmentToApiEvent(item, additionalProperties);
+            return mapAppointmentToApiEvent(item);
 
         } catch (e) {
             console.log(e.message, e.toString(), e.stack);

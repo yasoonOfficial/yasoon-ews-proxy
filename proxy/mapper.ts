@@ -1,7 +1,7 @@
 import * as moment from 'moment-timezone';
 import * as xmlEscape from 'xml-escape';
 
-import { Appointment, BodyType, MessageBody, StringList, DateTime, DateTimeKind, AttendeeCollection, MeetingResponseType, LegacyFreeBusyStatus, TimeZoneInfo, AppointmentType, PropertyDefinitionBase, ExtendedPropertyDefinition, IOutParam, DayOfTheWeek, Recurrence, DayOfTheWeekIndex } from "ews-javascript-api";
+import { Appointment, BodyType, MessageBody, StringList, DateTime, DateTimeKind, AttendeeCollection, MeetingResponseType, LegacyFreeBusyStatus, TimeZoneInfo, AppointmentType, PropertyDefinitionBase, ExtendedPropertyDefinition, IOutParam, DayOfTheWeek, Recurrence, DayOfTheWeekIndex, PropertyDefinition, AppointmentSchema } from "ews-javascript-api";
 import { OfficeApiEvent, EventAvailability, RecurrencePatternType, RecurrenceRangeType } from "../model/office";
 import { EnumValues } from "enum-values/src/enumValues";
 //import { raw } from 'body-parser';
@@ -124,17 +124,6 @@ export function mapAppointmentToApiEvent(item: Appointment, additionalProps?: Pr
         return null;
 
     let result: OfficeApiEvent = null;
-    let webLink: string = undefined;
-
-    if (item.WebClientReadFormQueryString) {
-        //According to https://msdn.microsoft.com/en-us/library/microsoft.exchange.webservices.data.item.webclientreadformquerystring(v=exchg.80).aspx
-        if (item.WebClientReadFormQueryString.indexOf('http') === 0) {
-            webLink = item.WebClientReadFormQueryString;
-        }
-        else {
-            webLink = `${item.Service.Url.Scheme}://${item.Service.Url.Host}/owa/${item.WebClientReadFormQueryString}`;
-        }
-    }
 
     //@ts-ignore
     if (item.Sensitivity !== "Normal") {
@@ -177,25 +166,56 @@ export function mapAppointmentToApiEvent(item: Appointment, additionalProps?: Pr
             isAllDay: item.IsAllDayEvent,
             //@ts-ignore
             showAs: getFreeBusyStatusNewName(LegacyFreeBusyStatus[item.LegacyFreeBusyStatus]),
-            categories: (item.Categories ? item.Categories.GetEnumerator() : []),
-            organizer: (item.Organizer ? ({
+            type: getAppointmentType(<any>item.AppointmentType),
+            seriesMasterId: (isSeriesItem(item)) ? "masterFor:" + item.Id.UniqueId : undefined,
+            sensitivity: <any>item.Sensitivity,
+        }
+
+        if (item.GetLoadedPropertyDefinitions().find((p: PropertyDefinition) => p.Name === AppointmentSchema.WebClientReadFormQueryString.Name)) {
+            let webLink = '';
+            //According to https://msdn.microsoft.com/en-us/library/microsoft.exchange.webservices.data.item.webclientreadformquerystring(v=exchg.80).aspx
+            if (item.WebClientReadFormQueryString.indexOf('http') === 0) {
+                webLink = item.WebClientReadFormQueryString;
+            } else {
+                webLink = `${item.Service.Url.Scheme}://${item.Service.Url.Host}/owa/${item.WebClientReadFormQueryString}`;
+            }
+            result.webLink = webLink;
+        }
+
+        if (item.GetLoadedPropertyDefinitions().find((p: PropertyDefinition) => p.Name === AppointmentSchema.IsReminderSet.Name)) {
+            result.isReminderOn = item.IsReminderSet;
+        }
+
+        if (item.GetLoadedPropertyDefinitions().find((p: PropertyDefinition) => p.Name === AppointmentSchema.ReminderMinutesBeforeStart.Name)) {
+            result.reminderMinutesBeforeStart = item.ReminderMinutesBeforeStart;
+        }
+
+        if (item.GetLoadedPropertyDefinitions().find((p: PropertyDefinition) => p.Name === AppointmentSchema.Organizer.Name)) {
+            result.organizer = ({
                 emailAddress: {
                     name: item.Organizer.Name,
                     address: item.Organizer.Address
                 }
-            }) : null),
-            type: getAppointmentType(<any>item.AppointmentType),
-            seriesMasterId: (isSeriesItem(item)) ? "masterFor:" + item.Id.UniqueId : undefined,
-            isReminderOn: item.IsReminderSet,
-            reminderMinutesBeforeStart: (item.IsReminderSet) ? item.ReminderMinutesBeforeStart : undefined,
-            attendees: all,
-            sensitivity: <any>item.Sensitivity,
-            body: (item.Body ? ({
+            });
+        }
+
+        if (item.GetLoadedPropertyDefinitions().find((p: PropertyDefinition) => p.Name === AppointmentSchema.Body.Name)) {
+            result.body = (item.Body ? ({
                 contentType: EnumValues.getNameFromValue(BodyType, item.Body.BodyType),
                 content: item.Body.Text
-            }) : null),
-            webLink: webLink
-        };
+            }) : null);
+        }
+
+        if (item.RequiredAttendees.Count >= 1 || item.OptionalAttendees.Count >= 1 || item.Resources.Count >= 1) {
+            let attendees = mapAttendees(item.RequiredAttendees, "Required");
+            let withOptional = attendees.concat(mapAttendees(item.OptionalAttendees, "Optional"));
+            let all = withOptional.concat(mapAttendees(item.Resources, "Resource"));
+            result.attendees = all;
+        }
+
+        if (item.GetLoadedPropertyDefinitions().find((p: PropertyDefinition) => p.Name === AppointmentSchema.Body.Name) && item.Categories.Count > 0) {
+            result.categories = item.Categories.GetEnumerator();
+        }
     }
 
     if (additionalProps && additionalProps.length > 0) {
