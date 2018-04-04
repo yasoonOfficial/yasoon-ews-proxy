@@ -112,6 +112,17 @@ app.get('/user/:email/calendars/:id/events', requestWrapper(async (req: express.
     res.send(result);
 }));
 
+app.get('/user/:email/calendars/:id/events/:eventId', requestWrapper(async (req: express.Request, res: express.Response) => {
+    let getSingleCalendarEvent = new GetSingleCalendarEventRequest();
+    let result = await getSingleCalendarEvent.execute(getEnvFromHeader(req, secret), {
+        email: req.params.email,
+        calendarId: req.params.id,
+        eventId: req.params.eventId,
+    });
+
+    res.send(result);
+}));
+
 app.post('/user/:email/calendars/:id/events', requestWrapper(async (req: express.Request, res: express.Response) => {
     let createEvent = new CreateEventRequest();
     let result = await createEvent.execute(getEnvFromHeader(req, secret), {
