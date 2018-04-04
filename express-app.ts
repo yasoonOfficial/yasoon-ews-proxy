@@ -20,6 +20,7 @@ import { DeleteEventRequest } from './proxy/delete-event';
 import { GetCategoriesRequest } from './proxy/get-categories';
 import { Monkey } from './extensions/Monkey';
 import { DeleteCalendarRequest } from './proxy/delete-calendar';
+import { GetSingleCalendarEventRequest } from './proxy/get-single-event';
 
 const customHeaders = [
     EWS_AUTH_TYPE_HEADER,

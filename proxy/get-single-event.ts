@@ -35,8 +35,8 @@ export class GetSingleCalendarEventRequest {
 
             let itemId = [new ItemId(eventId)];
 
-            let itemResponse = service.BindToItems(itemId, itemProps);
-            let item: Appointment = <Appointment>itemResponse[0].Responses[0].Item;
+            let itemResponse = await service.BindToItems(itemId, itemProps);
+            let item: Appointment = <Appointment>itemResponse.Responses[0].Item;
 
             if (item == null)
                 return null;
