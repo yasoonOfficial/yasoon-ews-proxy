@@ -57,9 +57,10 @@ app.post('/logging', (req: express.Request, res: express.Response) => {
 });
 
 app.get('/autodiscover', requestWrapper(async (req: express.Request, res: express.Response) => {
-    let userEmail = req.headers[EWS_USER_HEADER];
+    let userEmail = req.headers[EWS_MAILBOX_HEADER];
+    let userName = req.headers[EWS_USER_HEADER];
     let getAutodiscover = new GetAutodiscoverDataRequest();
-    let result = await getAutodiscover.execute(getEnvFromHeader(req, secret), { email: userEmail });
+    let result = await getAutodiscover.execute(getEnvFromHeader(req, secret), { email: userEmail, user: userName });
     res.send(result);
 }));
 
