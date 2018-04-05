@@ -152,7 +152,6 @@ export function mapAppointmentToApiEvent(item: Appointment, additionalProps?: Pr
 
         result = {
             id: item.Id.UniqueId,
-            calendarId: (item.ParentFolderId ? item.ParentFolderId.UniqueId : ''),
             subject: item.Subject,
             start: {
                 dateTime: item.Start.ToISOString(),
@@ -182,15 +181,19 @@ export function mapAppointmentToApiEvent(item: Appointment, additionalProps?: Pr
             result.webLink = webLink;
         }
 
-        if (item.GetLoadedPropertyDefinitions().find((p: PropertyDefinition) => p.Name === AppointmentSchema.IsReminderSet.Name)) {
+        if (this.hasProperty(item, AppointmentSchema.ParentFolderId)) {
+            result.calendarId = item.ParentFolderId.UniqueId;
+        }
+
+        if (this.hasProperty(item, AppointmentSchema.IsReminderSet)) {
             result.isReminderOn = item.IsReminderSet;
         }
 
-        if (item.GetLoadedPropertyDefinitions().find((p: PropertyDefinition) => p.Name === AppointmentSchema.ReminderMinutesBeforeStart.Name)) {
+        if (this.hasProperty(item, AppointmentSchema.ReminderMinutesBeforeStart)) {
             result.reminderMinutesBeforeStart = item.ReminderMinutesBeforeStart;
         }
 
-        if (item.GetLoadedPropertyDefinitions().find((p: PropertyDefinition) => p.Name === AppointmentSchema.Organizer.Name)) {
+        if (this.hasProperty(item, AppointmentSchema.Organizer)) {
             result.organizer = ({
                 emailAddress: {
                     name: item.Organizer.Name,
@@ -199,11 +202,11 @@ export function mapAppointmentToApiEvent(item: Appointment, additionalProps?: Pr
             });
         }
 
-        if (item.GetLoadedPropertyDefinitions().find((p: PropertyDefinition) => p.Name === AppointmentSchema.Body.Name)) {
-            result.body = (item.Body ? ({
+        if (this.hasProperty(item, AppointmentSchema.Body.Name)) {
+            result.body = ({
                 contentType: EnumValues.getNameFromValue(BodyType, item.Body.BodyType),
                 content: item.Body.Text
-            }) : null);
+            });
         }
 
         if (item.RequiredAttendees.Count >= 1 || item.OptionalAttendees.Count >= 1 || item.Resources.Count >= 1) {
@@ -213,7 +216,7 @@ export function mapAppointmentToApiEvent(item: Appointment, additionalProps?: Pr
             result.attendees = all;
         }
 
-        if (item.GetLoadedPropertyDefinitions().find((p: PropertyDefinition) => p.Name === AppointmentSchema.Body.Name) && item.Categories.Count > 0) {
+        if (this.hasProperty(item, AppointmentSchema.Body.Name) && item.Categories.Count > 0) {
             result.categories = item.Categories.GetEnumerator();
         }
     }
@@ -234,6 +237,13 @@ export function mapAppointmentToApiEvent(item: Appointment, additionalProps?: Pr
     return result;
 }
 
+export function hasProperty(item: Appointment, property: PropertyDefinition) {
+    if (item.GetLoadedPropertyDefinitions().find((p: PropertyDefinition) => p.Name === property.Name)) {
+        return true;
+    } else {
+        return false;
+    }
+}
 
 export function mapAttendees(attendees: AttendeeCollection, type: string) {
     return attendees.GetEnumerator().map(a => ({

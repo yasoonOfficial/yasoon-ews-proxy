@@ -67,14 +67,29 @@ export class GetAutodiscoverDataRequest {
         let ewsSupportedSchemas = userSettings.Settings[UserSettingName.EwsSupportedSchemas];
         let type = 'notSupported';
 
-        if (ewsUrl === 'https://outlook.office365.com/EWS/Exchange.asmx') {
+        if (this.isO365(externalMailboxServer)) {
             type = 'office365';
         } else if (ewsSupportedSchemas.includes("2013")) {
             type = 'onpremise2013';
         } else if (ewsSupportedSchemas.includes("2010")) {
-            type = "onpremise2010";
+            type = 'onpremise2010';
         }
 
         return { type: type, url: ewsUrl, authMode: authMode, externalMailboxServer: externalMailboxServer, ewsSupportedSchemas: ewsSupportedSchemas, userNameRequired: userNameRequired };
+    }
+
+    private isO365(externalMailboxServer: UserSettingName) {
+        if (externalMailboxServer.toString() === "outlook.office365.com")
+            return true;
+        else if (externalMailboxServer.toString() === "outlook.office365.com")
+            return true;
+        else if (externalMailboxServer.toString() === "outlook.office365.com")
+            return true;
+        else if (externalMailboxServer.toString() === "outlook.office365.com")
+            return true;
+        else if (externalMailboxServer.toString() === "outlook.office365.com")
+            return true;
+        else
+            return false;
     }
 }
