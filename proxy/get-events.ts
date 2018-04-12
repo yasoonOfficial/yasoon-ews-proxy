@@ -48,9 +48,9 @@ export class GetEventsRequest {
         additionalProperties.push(AppointmentSchema.LegacyFreeBusyStatus);
         additionalProperties.push(AppointmentSchema.Location);
         additionalProperties.push(AppointmentSchema.Categories);
-        additionalProperties.push(AppointmentSchema.ParentFolderId);
+        //additionalProperties.push(AppointmentSchema.ParentFolderId);
         additionalProperties.push(AppointmentSchema.AppointmentType);
-
+        additionalProperties.push(AppointmentSchema.IsMeeting);
         calendarView.PropertySet = new PropertySet(BasePropertySet.IdOnly, additionalProperties);
 
         try {

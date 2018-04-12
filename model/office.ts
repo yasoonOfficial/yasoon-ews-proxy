@@ -38,6 +38,7 @@ export interface OfficeApiEvent {
         range: RecurrenceRange;
     };
     seriesMasterId?: string;
+    isMeeting?: boolean;
 }
 
 

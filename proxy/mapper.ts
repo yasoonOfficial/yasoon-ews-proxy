@@ -168,6 +168,7 @@ export function mapAppointmentToApiEvent(item: Appointment, additionalProps?: Pr
             type: getAppointmentType(<any>item.AppointmentType),
             seriesMasterId: (isSeriesItem(item)) ? "masterFor:" + item.Id.UniqueId : undefined,
             sensitivity: <any>item.Sensitivity,
+            isMeeting: item.IsMeeting
         }
 
         if (item.GetLoadedPropertyDefinitions().find((p: PropertyDefinition) => p.Name === AppointmentSchema.WebClientReadFormQueryString.Name)) {
