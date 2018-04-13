@@ -246,6 +246,10 @@ export function hasProperty(item: Appointment, property: PropertyDefinition) {
     }
 }
 
+export function isNullOrEmpty(s: string): boolean {
+    return s == null || s.length === 0;
+}
+
 export function mapAttendees(attendees: AttendeeCollection, type: string) {
     return attendees.GetEnumerator().map(a => ({
         type: type,
