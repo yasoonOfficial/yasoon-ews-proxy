@@ -133,5 +133,16 @@ export enum RecurrencePatternType {
 }
 
 export enum RecurrenceRangeType {
-    EndDate = 'EndDate', NoEnd = 'NoEnd', Numbered = 'Numbered'
+    EndDate = 'EndDate', 
+    NoEnd = 'NoEnd', 
+    Numbered = 'Numbered'
+}
+
+export interface OfficeUser {
+    id?: string;
+    displayName?: string;
+    mail?: string;
+    givenName?: string;
+    surname?: string;
+    personaType?: string;
 }

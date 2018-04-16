@@ -1,7 +1,8 @@
 import { Environment } from "../model/proxy";
-import { ExchangeService, Uri, ItemView } from "ews-javascript-api";
+import { ExchangeService, Uri, ResolveNameSearchLocation, NameResolution } from "ews-javascript-api";
 import { applyCredentials } from "../proxy/helper";
-import { FindPeopleRequest } from '../extensions/FindPeopleRequest';
+import { OfficeUser } from '../model/office';
+
 
 export class GetUserRequest {
 
@@ -10,30 +11,36 @@ export class GetUserRequest {
         service.Url = new Uri(env.ewsUrl);
         applyCredentials(service, env);
 
-        var request = <any>new FindPeopleRequest(service, null);
-        request.QueryString = params.email;
-        request.View = new ItemView(100);
-        let response = await request.Execute();
+        try {
+            let results = await service.ResolveName(params.email, ResolveNameSearchLocation.DirectoryOnly, true);
+            //Not sure this can really happen... (i mean > 1)
+            let res: NameResolution = null;
+            if (results.Count == 1) {
+                res = results._getItem(0);
+            } else {
+                let it = results.GetEnumerator();
+                it.map((result) => {
+                    if (result.Mailbox.Address.toLowerCase() === params.email.toLowerCase()) {
+                        res = result;
+                    }
+                });
+            }
 
-        //Special case for aliases
-        if (response.People.length === 1) {
-            return response.People.map((p) => ({
-                id: p.PersonaId.Id,
-                displayName: p.DisplayName,
-                mail: p.EmailAddress.EmailAddress,
-                givenName: p.GivenName,
-                surname: p.Surname,
-                personaType: p.PersonaType
-            }))[0];
-        } else {
-            return response.People.filter(p => (p.PersonaType === 'Person' || p.PersonaType === 'Room') && p.EmailAddress.EmailAddress === params.email).map((p) => ({
-                id: p.PersonaId.Id,
-                displayName: p.DisplayName,
-                mail: p.EmailAddress.EmailAddress,
-                givenName: p.GivenName,
-                surname: p.Surname,
-                personaType: p.PersonaType
-            }))[0];
+            let result: OfficeUser = null
+            result = {
+                displayName: res.Contact.DisplayName,
+                givenName: res.Contact.GivenName,
+                id: res.Mailbox.Name,
+                mail: res.Mailbox.Address,
+                surname: res.Contact.Surname,
+                personaType: res.Mailbox.MailboxType.toString()
+            }
+
+            return result;
+
+        } catch (e) {
+            console.log(e.message, e.toString(), e.stack);
+            return [];
         }
     }
 }

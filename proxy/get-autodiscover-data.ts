@@ -50,7 +50,7 @@ export class GetAutodiscoverDataRequest {
             await request.Execute();
             success = true;
         } catch (e) {
-            errorMessage += "Error Message from Email + PW / NTLM";
+            errorMessage += "\r\n\r\n Error Message from Email + PW / NTLM " + e;
             try {
                 //If not, check ntlm with User Name
                 let testService = new ExchangeService();
@@ -65,20 +65,20 @@ export class GetAutodiscoverDataRequest {
                 userNameRequired = true;
                 success = true;
             } catch (e) {
-                errorMessage += "Error Message from User + PW / NTLM";
+                errorMessage += "\r\n\r\n Error Message from User + PW / NTLM " + e;
                 try {
                     let testService = new ExchangeService();
                     testService.Credentials = new WebCredentials(userEmail, env.ewsPassword);
                     authMode = 'basic';
                     success = true;
                 } catch (e) {
-                    errorMessage += "Error Message from Email + PW / Basic";
+                    errorMessage += "\r\n\r\n Error Message from Email + PW / Basic" + e;
                 }
             }
         }
 
         if (isNullOrEmpty(ewsUrl)) {
-            errorMessage += "No internal or external EWS Url could be found";
+            errorMessage += "\r\n\r\n No internal or external EWS Url could be found";
             success = false;
         }
 
