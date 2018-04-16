@@ -1,9 +1,10 @@
 import * as moment from 'moment-timezone';
 import * as xmlEscape from 'xml-escape';
 
-import { OfficeApiEvent, EventAvailability } from "../model/office";
-import { Appointment, BodyType, MessageBody, StringList, DateTime, DateTimeKind, AttendeeCollection, MeetingResponseType, LegacyFreeBusyStatus, TimeZoneInfo, AppointmentType, PropertyDefinitionBase, ExtendedProperty, ExtendedPropertyDefinition, IOutParam } from "ews-javascript-api";
+import { Appointment, BodyType, MessageBody, StringList, DateTime, DateTimeKind, AttendeeCollection, MeetingResponseType, LegacyFreeBusyStatus, TimeZoneInfo, AppointmentType, PropertyDefinitionBase, ExtendedPropertyDefinition, IOutParam, DayOfTheWeek, Recurrence, DayOfTheWeekIndex, PropertyDefinition, AppointmentSchema } from "ews-javascript-api";
+import { OfficeApiEvent, EventAvailability, RecurrencePatternType, RecurrenceRangeType } from "../model/office";
 import { EnumValues } from "enum-values/src/enumValues";
+//import { raw } from 'body-parser';
 
 export function copyApiEventToAppointment(rawEvent: OfficeApiEvent, appointment: Appointment) {
     //Let the mapping begin!
@@ -73,6 +74,49 @@ export function copyApiEventToAppointment(rawEvent: OfficeApiEvent, appointment:
         appointment.End.kind = DateTimeKind.Unspecified;
         appointment.EndTimeZone = endTimezone;
     }
+
+    if (rawEvent.recurrence) {
+        //Recurrence is not typed correctly....
+        if (rawEvent.recurrence.pattern) {
+            if (rawEvent.recurrence.pattern.type === RecurrencePatternType.Daily) {
+                //@ts-ignore
+                appointment.Recurrence = new Recurrence.DailyPattern(new DateTime(rawEvent.recurrence.range.startDate), rawEvent.recurrence.pattern.interval);
+            } else if (rawEvent.recurrence.pattern.type === RecurrencePatternType.Weekly) {
+                let daysOfWeekEnum = mapDaysOfTheWeek(rawEvent.recurrence.pattern.daysOfWeek);
+                //@ts-ignore
+                appointment.Recurrence = new Recurrence.WeeklyPattern(new DateTime(rawEvent.recurrence.range.startDate), rawEvent.recurrence.pattern.interval, daysOfWeekEnum);
+            } else if (rawEvent.recurrence.pattern.type === RecurrencePatternType.RelativeMonthly) {
+                //@ts-ignore
+                appointment.Recurrence = new Recurrence.RelativeMonthlyPattern(new DateTime(rawEvent.recurrence.range.startDate), rawEvent.recurrence.pattern.interval, DayOfTheWeek[rawEvent.recurrence.pattern.daysOfWeek[0]], DayOfTheWeekIndex[rawEvent.recurrence.pattern.index]);
+            } else if (rawEvent.recurrence.pattern.type === RecurrencePatternType.AbsoluteMonthly) {
+                //@ts-ignore
+                appointment.Recurrence = new Recurrence.MonthlyPattern(new DateTime(rawEvent.recurrence.startDate), rawEvent.recurrence.pattern.interval, rawEvent.recurrence.pattern.dayOfMonth);
+            } else if (rawEvent.recurrence.pattern.type === RecurrencePatternType.RelativeYearly) {
+                //@ts-ignore
+                appointment.Recurrence = new Recurrence.RelativeYearlyPattern(new DateTime(rawEvent.recurrence.range.startDate), rawEvent.recurrence.pattern.month, DayOfTheWeek[rawEvent.recurrence.pattern.daysOfWeek[0]], DayOfTheWeekIndex[rawEvent.recurrence.pattern.index]);
+            } else if (rawEvent.recurrence.pattern.type === RecurrencePatternType.AbsoluteYearly) {
+                //@ts-ignore
+                appointment.Recurrence = new Recurrence.YearlyPattern(new DateTime(rawEvent.recurrence.range.startDate), rawEvent.recurrence.pattern.month, rawEvent.recurrence.pattern.dayOfMonth);
+            }
+        }
+
+        if (rawEvent.recurrence.range) {
+            appointment.Recurrence.startDate = new DateTime(rawEvent.recurrence.range.startDate);
+            if (rawEvent.recurrence.range.type === RecurrenceRangeType.Numbered) {
+                appointment.Recurrence.numberOfOccurrences = rawEvent.recurrence.range.numberOfOccurrences;
+            } else if (rawEvent.recurrence.range.type === RecurrenceRangeType.EndDate) {
+                appointment.Recurrence.endDate = new DateTime(rawEvent.recurrence.range.endDate);
+            }
+        }
+    }
+}
+
+export function mapDaysOfTheWeek(daysOfWeek): DayOfTheWeek[] {
+    let daysOfWeekEnum = []
+    daysOfWeek.map((day) => {
+        daysOfWeekEnum.push(DayOfTheWeek[day]);
+    });
+    return daysOfWeekEnum;
 }
 
 export function mapAppointmentToApiEvent(item: Appointment, additionalProps?: PropertyDefinitionBase[]): OfficeApiEvent {
@@ -80,17 +124,6 @@ export function mapAppointmentToApiEvent(item: Appointment, additionalProps?: Pr
         return null;
 
     let result: OfficeApiEvent = null;
-    let webLink: string = undefined;
-
-    if (item.WebClientReadFormQueryString) {
-        //According to https://msdn.microsoft.com/en-us/library/microsoft.exchange.webservices.data.item.webclientreadformquerystring(v=exchg.80).aspx
-        if (item.WebClientReadFormQueryString.indexOf('http') === 0) {
-            webLink = item.WebClientReadFormQueryString;
-        }
-        else {
-            webLink = `${item.Service.Url.Scheme}://${item.Service.Url.Host}/owa/${item.WebClientReadFormQueryString}`;
-        }
-    }
 
     //@ts-ignore
     if (item.Sensitivity !== "Normal") {
@@ -119,7 +152,6 @@ export function mapAppointmentToApiEvent(item: Appointment, additionalProps?: Pr
 
         result = {
             id: item.Id.UniqueId,
-            calendarId: (item.ParentFolderId ? item.ParentFolderId.UniqueId : ''),
             subject: item.Subject,
             start: {
                 dateTime: item.Start.ToISOString(),
@@ -133,25 +165,61 @@ export function mapAppointmentToApiEvent(item: Appointment, additionalProps?: Pr
             isAllDay: item.IsAllDayEvent,
             //@ts-ignore
             showAs: getFreeBusyStatusNewName(LegacyFreeBusyStatus[item.LegacyFreeBusyStatus]),
-            categories: (item.Categories ? item.Categories.GetEnumerator() : []),
-            organizer: (item.Organizer ? ({
+            type: getAppointmentType(<any>item.AppointmentType),
+            seriesMasterId: (isSeriesItem(item)) ? "masterFor:" + item.Id.UniqueId : undefined,
+            sensitivity: <any>item.Sensitivity,
+            isMeeting: item.IsMeeting
+        }
+
+        if (item.GetLoadedPropertyDefinitions().find((p: PropertyDefinition) => p.Name === AppointmentSchema.WebClientReadFormQueryString.Name)) {
+            let webLink = '';
+            //According to https://msdn.microsoft.com/en-us/library/microsoft.exchange.webservices.data.item.webclientreadformquerystring(v=exchg.80).aspx
+            if (item.WebClientReadFormQueryString.indexOf('http') === 0) {
+                webLink = item.WebClientReadFormQueryString;
+            } else {
+                webLink = `${item.Service.Url.Scheme}://${item.Service.Url.Host}/owa/${item.WebClientReadFormQueryString}`;
+            }
+            result.webLink = webLink;
+        }
+
+        if (this.hasProperty(item, AppointmentSchema.ParentFolderId)) {
+            result.calendarId = item.ParentFolderId.UniqueId;
+        }
+
+        if (this.hasProperty(item, AppointmentSchema.IsReminderSet)) {
+            result.isReminderOn = item.IsReminderSet;
+        }
+
+        if (this.hasProperty(item, AppointmentSchema.ReminderMinutesBeforeStart)) {
+            result.reminderMinutesBeforeStart = item.ReminderMinutesBeforeStart;
+        }
+
+        if (this.hasProperty(item, AppointmentSchema.Organizer)) {
+            result.organizer = ({
                 emailAddress: {
                     name: item.Organizer.Name,
                     address: item.Organizer.Address
                 }
-            }) : null),
-            type: getAppointmentType(<any>item.AppointmentType),
-            seriesMasterId: (isSeriesItem(item)) ? "masterFor:" + item.Id.UniqueId : undefined,
-            isReminderOn: item.IsReminderSet,
-            reminderMinutesBeforeStart: (item.IsReminderSet) ? item.ReminderMinutesBeforeStart : undefined,
-            attendees: all,
-            sensitivity: <any>item.Sensitivity,
-            body: (item.Body ? ({
+            });
+        }
+
+        if (this.hasProperty(item, AppointmentSchema.Body.Name)) {
+            result.body = ({
                 contentType: EnumValues.getNameFromValue(BodyType, item.Body.BodyType),
                 content: item.Body.Text
-            }) : null),
-            webLink: webLink
-        };
+            });
+        }
+
+        if (item.RequiredAttendees.Count >= 1 || item.OptionalAttendees.Count >= 1 || item.Resources.Count >= 1) {
+            let attendees = mapAttendees(item.RequiredAttendees, "Required");
+            let withOptional = attendees.concat(mapAttendees(item.OptionalAttendees, "Optional"));
+            let all = withOptional.concat(mapAttendees(item.Resources, "Resource"));
+            result.attendees = all;
+        }
+
+        if (this.hasProperty(item, AppointmentSchema.Body.Name) && item.Categories.Count > 0) {
+            result.categories = item.Categories.GetEnumerator();
+        }
     }
 
     if (additionalProps && additionalProps.length > 0) {
@@ -170,6 +238,17 @@ export function mapAppointmentToApiEvent(item: Appointment, additionalProps?: Pr
     return result;
 }
 
+export function hasProperty(item: Appointment, property: PropertyDefinition) {
+    if (item.GetLoadedPropertyDefinitions().find((p: PropertyDefinition) => p.Name === property.Name)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+export function isNullOrEmpty(s: string): boolean {
+    return s == null || s.length === 0;
+}
 
 export function mapAttendees(attendees: AttendeeCollection, type: string) {
     return attendees.GetEnumerator().map(a => ({

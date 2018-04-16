@@ -1,7 +1,7 @@
 import * as moment from 'moment-timezone';
 
 import { Environment } from "../model/proxy";
-import { ExchangeService, Uri, FolderId, WellKnownFolderName, Mailbox, BasePropertySet, PropertySet, DateTime, CalendarView, AppointmentSchema, Appointment, ExchangeVersion, TimeZoneInfo, PropertyDefinitionBase } from "ews-javascript-api";
+import { ExchangeService, Uri, FolderId, WellKnownFolderName, Mailbox, BasePropertySet, PropertySet, DateTime, CalendarView, AppointmentSchema, ExchangeVersion, TimeZoneInfo, PropertyDefinitionBase } from "ews-javascript-api";
 import { applyCredentials } from "../proxy/helper";
 import { mapAppointmentToApiEvent } from '../proxy/mapper';
 import { OfficeApiEvent } from '../model/office';
@@ -38,12 +38,19 @@ export class GetEventsRequest {
         calendarView.MaxItemsReturned = 250;
 
         let additionalProperties = params.additionalProperties || [];
+        additionalProperties.push(AppointmentSchema.Subject);
         additionalProperties.push(AppointmentSchema.Sensitivity);
         additionalProperties.push(AppointmentSchema.Start);
+        additionalProperties.push(AppointmentSchema.StartTimeZone);
         additionalProperties.push(AppointmentSchema.End);
+        additionalProperties.push(AppointmentSchema.EndTimeZone);
         additionalProperties.push(AppointmentSchema.IsAllDayEvent);
         additionalProperties.push(AppointmentSchema.LegacyFreeBusyStatus);
-
+        additionalProperties.push(AppointmentSchema.Location);
+        additionalProperties.push(AppointmentSchema.Categories);
+        //additionalProperties.push(AppointmentSchema.ParentFolderId);
+        additionalProperties.push(AppointmentSchema.AppointmentType);
+        additionalProperties.push(AppointmentSchema.IsMeeting);
         calendarView.PropertySet = new PropertySet(BasePropertySet.IdOnly, additionalProperties);
 
         try {
@@ -51,21 +58,18 @@ export class GetEventsRequest {
             if (ewsResult.Items.length === 0)
                 return [];
 
-            let props = new PropertySet(BasePropertySet.FirstClassProperties, AppointmentSchema.StartTimeZone);
-            let itemResponse = await service.BindToItems(ewsResult.Items.map(i => i.Id), props);
-
             let responseArray: OfficeApiEvent[] = [];
-            for (let i = 0; i < itemResponse.Responses.length; i++) {
-                let item: Appointment = <Appointment>itemResponse.Responses[i].Item;
+            for (let i = 0; i < ewsResult.Items.length; i++) {
+                let item = ewsResult.Items[i];
 
                 //Might be private.. Check in ewsResult
                 if (!item) {
                     //@ts-ignore
                     if (ewsResult.Items[i] && ewsResult.Items[i].Sensitivity !== "Normal") {
-                        responseArray.push(mapAppointmentToApiEvent(ewsResult.Items[i], params.additionalProperties));
+                        responseArray.push(mapAppointmentToApiEvent(ewsResult.Items[i]));
                     }
                 } else {
-                    responseArray.push(mapAppointmentToApiEvent(item, params.additionalProperties));
+                    responseArray.push(mapAppointmentToApiEvent(item));
                 }
             }
 

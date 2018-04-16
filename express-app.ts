@@ -19,6 +19,8 @@ import { EWS_AUTH_TYPE_HEADER, EWS_TOKEN_HEADER, EWS_URL_HEADER, EWS_USER_HEADER
 import { DeleteEventRequest } from './proxy/delete-event';
 import { GetCategoriesRequest } from './proxy/get-categories';
 import { Monkey } from './extensions/Monkey';
+import { DeleteCalendarRequest } from './proxy/delete-calendar';
+import { GetSingleCalendarEventRequest } from './proxy/get-single-event';
 
 const customHeaders = [
     EWS_AUTH_TYPE_HEADER,
@@ -54,10 +56,9 @@ app.post('/logging', (req: express.Request, res: express.Response) => {
     res.status(200).send();
 });
 
-app.get('/autodiscover', requestWrapper(async (req: express.Request, res: express.Response) => {
-    let userEmail = req.headers[EWS_USER_HEADER];
+app.get('/autodiscover/:email', requestWrapper(async (req: express.Request, res: express.Response) => {
     let getAutodiscover = new GetAutodiscoverDataRequest();
-    let result = await getAutodiscover.execute(getEnvFromHeader(req, secret), { email: userEmail });
+    let result = await getAutodiscover.execute(getEnvFromHeader(req, secret), req.params);
     res.send(result);
 }));
 
@@ -106,6 +107,17 @@ app.get('/user/:email/calendars/:id/events', requestWrapper(async (req: express.
         email: req.params.email,
         startDate: req.query.startDate,
         endDate: req.query.endDate
+    });
+
+    res.send(result);
+}));
+
+app.get('/user/:email/calendars/:id/events/:eventId', requestWrapper(async (req: express.Request, res: express.Response) => {
+    let getSingleCalendarEvent = new GetSingleCalendarEventRequest();
+    let result = await getSingleCalendarEvent.execute(getEnvFromHeader(req, secret), {
+        email: req.params.email,
+        calendarId: req.params.id,
+        eventId: req.params.eventId,
     });
 
     res.send(result);
@@ -186,6 +198,15 @@ app.post('/user/:email/calendars/:id/events/:eventId/delete', requestWrapper(asy
         type: req.body.type
     });
     res.status(200).send({});
+}));
+
+app.delete('/user/:email/calendars/:id/delete', requestWrapper(async (req: express.Request, res: express.Response) => {
+    let deleteRequest = new DeleteCalendarRequest();
+    await deleteRequest.execute(getEnvFromHeader(req, secret), {
+        calendarId: req.params.id,
+        email: req.params.email
+    });
+    res.status(204).send({});
 }));
 
 export = app;
