@@ -21,6 +21,7 @@ import { GetCategoriesRequest } from './proxy/get-categories';
 import { Monkey } from './extensions/Monkey';
 import { DeleteCalendarRequest } from './proxy/delete-calendar';
 import { GetSingleCalendarEventRequest } from './proxy/get-single-event';
+import { GetOwnUserRequest } from './proxy/get-own-user';
 
 const customHeaders = [
     EWS_AUTH_TYPE_HEADER,
@@ -71,6 +72,12 @@ app.get('/user/:email/publicFolderMailbox', requestWrapper(async (req: express.R
 app.get('/user/search', requestWrapper(async (req: express.Request, res: express.Response) => {
     let searchUser = new SearchUserRequest();
     let result = await searchUser.execute(getEnvFromHeader(req, secret), req.query);
+    res.send(result);
+}));
+
+app.get('/user/me', requestWrapper(async (req: express.Request, res: express.Response) => {
+    let getUser = new GetOwnUserRequest();
+    let result = await getUser.execute(getEnvFromHeader(req, secret));
     res.send(result);
 }));
 

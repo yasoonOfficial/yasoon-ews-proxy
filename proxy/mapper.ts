@@ -146,10 +146,6 @@ export function mapAppointmentToApiEvent(item: Appointment, additionalProps?: Pr
         };
     } else {
 
-        let attendees = mapAttendees(item.RequiredAttendees, "Required");
-        let withOptional = attendees.concat(mapAttendees(item.OptionalAttendees, "Optional"));
-        let all = withOptional.concat(mapAttendees(item.Resources, "Resource"));
-
         result = {
             id: item.Id.UniqueId,
             subject: item.Subject,

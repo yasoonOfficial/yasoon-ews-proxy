@@ -1,10 +1,8 @@
 import { Environment } from "../model/proxy";
-import { applyCredentials, validateAutodiscoverRedirection } from "../proxy/helper";
-import { AutodiscoverService, GetUserSettingsResponse, UserSettingName, ExchangeService, ItemView, Uri, WebCredentials } from "ews-javascript-api";
-import { AutodiscoverService as NtlmAutodiscoverService } from '../extensions/CustomAutodiscoverService';
-import { NtlmExchangeService } from '../extensions/NtlmAutodiscoverService';
+import { validateAutodiscoverRedirection } from "../proxy/helper";
+import { AutodiscoverService, GetUserSettingsResponse, UserSettingName, ExchangeService, Uri, WebCredentials, ExchangeVersion, ResolveNameSearchLocation, ExchangeServiceBase } from "ews-javascript-api";
+import { AutodiscoverService as CustomAutodiscoverService } from '../extensions/CustomAutodiscoverService';
 import { ntlmAuthXhrApi } from "../extensions/CustomNtlmAuthXhrApi";
-import { FindPeopleRequest } from '../extensions/FindPeopleRequest';
 import { isNullOrEmpty } from './mapper';
 
 export class GetAutodiscoverDataRequest {
@@ -12,78 +10,120 @@ export class GetAutodiscoverDataRequest {
     async execute(env: Environment, params: { email: string }) {
         let userEmail = params.email;
         let userName = env.ewsUser;
-        let service: ExchangeService = <any>new NtlmExchangeService();
-        applyCredentials(service, env);
+        let password = new Buffer(env.ewsPassword, 'base64').toString();
 
-        await service.AutodiscoverUrl(userEmail, validateAutodiscoverRedirection);
-
-        let discoverService: AutodiscoverService = <any>new NtlmAutodiscoverService();
+        let discoverService: AutodiscoverService = <any>new CustomAutodiscoverService();
         discoverService.RedirectionUrlValidationCallback = validateAutodiscoverRedirection;
-        applyCredentials(discoverService, env);
 
         let userSettings: GetUserSettingsResponse;
 
-        userSettings = await discoverService.GetUserSettings(
-            userEmail,
-            UserSettingName.ExternalMailboxServer,
-            UserSettingName.EwsSupportedSchemas
-        );
-
-        let ewsUrl = service.Url.AbsoluteUri;
-        let authMode = 'ntlm';
-        let userNameRequired: boolean = false;
-        let errorMessage = '';
-        let success: boolean = false;
-
-        //Try if we should use ntlm or basic, fallback to ntlm
-        try {
-            //To-do move this to own function
-            //Check if ntlm works with User Email
-            let testService = new ExchangeService();
-            testService.Url = new Uri(ewsUrl);
-            testService.XHRApi = new ntlmAuthXhrApi(userEmail, new Buffer(env.ewsPassword, 'base64').toString());
-            testService.UseDefaultCredentials = true; //Bug... 
-
-            var request = <any>new FindPeopleRequest(testService, null);
-            request.QueryString = userEmail;
-            request.View = new ItemView(100);
-            await request.Execute();
-            success = true;
-        } catch (e) {
-            errorMessage += "\r\n\r\n Error Message from Email + PW / NTLM " + e;
-            try {
-                //If not, check ntlm with User Name
-                let testService = new ExchangeService();
-                testService.Url = new Uri(ewsUrl);
-                testService.XHRApi = new ntlmAuthXhrApi(userName, new Buffer(env.ewsPassword, 'base64').toString());
-                testService.UseDefaultCredentials = true; //Bug... 
-
-                var request = <any>new FindPeopleRequest(testService, null);
-                request.QueryString = userEmail;
-                request.View = new ItemView(100);
-                await request.Execute();
-                userNameRequired = true;
-                success = true;
-            } catch (e) {
-                errorMessage += "\r\n\r\n Error Message from User + PW / NTLM " + e;
-                try {
-                    let testService = new ExchangeService();
-                    testService.Credentials = new WebCredentials(userEmail, env.ewsPassword);
-                    authMode = 'basic';
-                    success = true;
-                } catch (e) {
-                    errorMessage += "\r\n\r\n Error Message from Email + PW / Basic" + e;
+        //First try basic with userName & pw, then NTLM with userName & pw
+        let credentials = [
+            {
+                authMode: 'basic',
+                userNameRequired: true,
+                apply: (svc: ExchangeServiceBase) => svc.Credentials = new WebCredentials(userName, password)
+            },
+            {
+                authMode: 'basic',
+                userNameRequired: false,
+                apply: (svc: ExchangeServiceBase) => svc.Credentials = new WebCredentials(userEmail, password)
+            },
+            {
+                authMode: 'ntlm',
+                userNameRequired: true,
+                apply: (svc: ExchangeServiceBase) => {
+                    svc.Credentials = null;
+                    svc.XHRApi = new ntlmAuthXhrApi(userName, password, true);
+                    svc.UseDefaultCredentials = true; //Bug... 
                 }
+            },
+            {
+                authMode: 'ntlm',
+                userNameRequired: false,
+                apply: (svc: ExchangeServiceBase) => {
+                    svc.Credentials = null;
+                    svc.XHRApi = new ntlmAuthXhrApi(userEmail, password, true);
+                    svc.UseDefaultCredentials = true; //Bug... 
+                }
+            },
+        ];
+
+        let errors = [];
+        for (const credential of credentials) {
+            try {
+                credential.apply(discoverService);
+                userSettings = await discoverService.GetUserSettings(
+                    userEmail,
+                    UserSettingName.InternalEwsUrl,
+                    UserSettingName.ExternalEwsUrl,
+                    UserSettingName.ExternalMailboxServer,
+                    UserSettingName.EwsSupportedSchemas
+                );
+
+                break;
+            }
+            catch (e) {
+                errors.push(e.toString());
             }
         }
 
-        if (isNullOrEmpty(ewsUrl)) {
-            errorMessage += "\r\n\r\n No internal or external EWS Url could be found";
-            success = false;
+        //If we don't have user settings by now, abort..
+        if (!userSettings) {
+            return {
+                success: false,
+                errorMessage: "Couldn't connect to autodiscover service... \r\n" + errors.join('\r\n\r\n')
+            };
         }
 
-        let extHost = userSettings.Settings[UserSettingName.ExternalMailboxServer];
-        let ewsSupportedSchemas = userSettings.Settings[UserSettingName.EwsSupportedSchemas];
+        //Determine correct ews url
+        let ewsUrl = userSettings.Settings[UserSettingName.ExternalEwsUrl];
+        if (!discoverService.IsExternal || isNullOrEmpty(ewsUrl)) {
+            let intUrl = userSettings.Settings[UserSettingName.InternalEwsUrl];
+            if (!isNullOrEmpty(intUrl)) {
+                ewsUrl = intUrl;
+            }
+        }
+
+        if (!ewsUrl) {
+            return {
+                success: false,
+                errorMessage: "Couldn't retrieve ews URL... \r\n" + errors.join('\r\n\r\n')
+            };
+        }
+
+        //Use resolve service to find working configuration..
+        let exchangeService = new ExchangeService(ExchangeVersion.Exchange2010);
+        exchangeService.Url = new Uri(ewsUrl);
+
+        let authMode = null;
+        let userNameRequired: boolean = null;
+
+        for (const credential of credentials) {
+            try {
+                credential.apply(exchangeService);
+                await exchangeService.ResolveName(params.email, ResolveNameSearchLocation.DirectoryOnly, true);
+
+                //It worked, take over parameters & break
+                authMode = credential.authMode;
+                userNameRequired = credential.userNameRequired;
+
+                break;
+            }
+            catch (e) {
+                errors.push(e.toString());
+            }
+        }
+
+        if (authMode === null || userNameRequired === null) {
+            return {
+                success: false,
+                errorMessage: "Couldn't connect to resolve-service \r\n" + errors.join('\r\n\r\n')
+            };
+        }
+
+        let extHost: string = userSettings.Settings[UserSettingName.ExternalMailboxServer];
+        let ewsSupportedSchemas: string = userSettings.Settings[UserSettingName.EwsSupportedSchemas];
 
         let mode = "unknown";
         if ("outlook.office365.com" === extHost) {
@@ -92,14 +132,14 @@ export class GetAutodiscoverDataRequest {
             mode = "office365:china";
         } else if ("outlook.office.de" === extHost) {
             mode = "office365:germany";
-        } else if (extHost != null && extHost.contains("office365.us")) {
+        } else if (extHost != null && extHost.includes("office365.us")) {
             mode = "office365:gov";
-        } else if (ewsSupportedSchemas.contains("2013")) {
+        } else if (ewsSupportedSchemas.includes("2013")) {
             mode = "onpremise2013";
-        } else if (ewsSupportedSchemas.contains("2010")) {
+        } else if (ewsSupportedSchemas.includes("2010")) {
             mode = "onpremise2010";
         }
 
-        return { success: success, errorMessage: errorMessage, mode: mode, url: ewsUrl, authMode: authMode, extHost: extHost, ewsSupportedSchemas: ewsSupportedSchemas, userNameRequired: userNameRequired };
+        return { success: true, mode: mode, url: ewsUrl, authMode: authMode, extHost: extHost, ewsSupportedSchemas: ewsSupportedSchemas, userNameRequired: userNameRequired };
     }
 }

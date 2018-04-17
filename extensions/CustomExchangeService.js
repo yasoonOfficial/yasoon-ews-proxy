@@ -25,14 +25,14 @@ var UserSettingName_1 = require("ews-javascript-api/js/Enumerations/UserSettingN
  * Represents a binding to the **Exchange Web Services**.
  *
  */
-var NtlmAutodiscoverService = (function (_super) {
-    __extends(NtlmAutodiscoverService, _super);
+var CustomExchangeService = (function (_super) {
+    __extends(CustomExchangeService, _super);
 
-    function NtlmAutodiscoverService() {
+    function CustomExchangeService() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
     }
 
-    NtlmAutodiscoverService.prototype.GetAutodiscoverUrl = function (emailAddress, requestedServerVersion, validateRedirectionUrlCallback) {
+    CustomExchangeService.prototype.GetAutodiscoverUrl = function (emailAddress, requestedServerVersion, validateRedirectionUrlCallback) {
         var _this = this;
         var autodiscoverService = new AutodiscoverService_1.AutodiscoverService(null, null, requestedServerVersion);
         autodiscoverService.Credentials = this.Credentials;
@@ -57,7 +57,7 @@ var NtlmAutodiscoverService = (function (_super) {
             });
     };
 
-    return NtlmAutodiscoverService;
+    return CustomExchangeService;
 }(ExchangeService_1.ExchangeService));
 
-exports.NtlmExchangeService = NtlmAutodiscoverService;
+exports.CustomExchangeService = CustomExchangeService;
