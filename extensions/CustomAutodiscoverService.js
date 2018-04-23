@@ -281,10 +281,8 @@ var AutodiscoverService = (function (_super) {
                     _this.TraceMessage(TraceFlags_1.TraceFlags.All, "***hard checking for office 365 with node.js http request and presence of header x-federationtrusttokenissueruri= urn:federation:MicrosoftOnline");
                     var redirectUrl = null;
                     if (!ExtensionMethods_1.StringHelper.IsNullOrEmpty(resperr.getResponseHeader("x-federationtrusttokenissueruri"))) {
-                        if (resperr.getResponseHeader("x-federationtrusttokenissueruri") === "urn:federation:MicrosoftOnline") {
-                            redirectUrl = "https://autodiscover-s.outlook.com/autodiscover/autodiscover.svc";
-                            _this.TraceMessage(TraceFlags_1.TraceFlags.All, "possible hard match for O365 based on federation header (could be any legitimate 302 redirect - less likely)\r\n trying to connect to O365 multitenent autodiscover url: " + redirectUrl);
-                        }
+                        redirectUrl = resperr.finalUrl.replace('.xml', '.svc');
+                        _this.TraceMessage(TraceFlags_1.TraceFlags.All, "possible hard match for O365 based on federation header (could be any legitimate 302 redirect - less likely)\r\n trying to connect to O365 multitenent autodiscover url: " + redirectUrl);
                         return new Uri_1.Uri(redirectUrl);
                     }
                 }
