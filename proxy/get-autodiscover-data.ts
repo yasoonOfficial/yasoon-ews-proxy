@@ -127,7 +127,7 @@ export class GetAutodiscoverDataRequest {
 
         let mode = "unknown";
         if ("outlook.office365.com" === extHost) {
-            mode = "office365:public";
+            mode = "office365";
         } else if ("partner.outlook.cn" === extHost) {
             mode = "office365:china";
         } else if ("outlook.office.de" === extHost) {
@@ -135,7 +135,7 @@ export class GetAutodiscoverDataRequest {
         } else if (extHost != null && extHost.includes("office365.us")) {
             mode = "office365:gov";
         } else if (ewsSupportedSchemas.includes("2013")) {
-            mode = "onpremise2013";
+            mode = "onpremise";
         } else if (ewsSupportedSchemas.includes("2010")) {
             mode = "onpremise2010";
         }
