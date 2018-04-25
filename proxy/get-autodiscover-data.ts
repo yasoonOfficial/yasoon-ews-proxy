@@ -140,6 +140,6 @@ export class GetAutodiscoverDataRequest {
             mode = "onpremise2010";
         }
 
-        return { success: true, mode: mode, url: ewsUrl, authMode: authMode, extHost: extHost, ewsSupportedSchemas: ewsSupportedSchemas, userNameRequired: userNameRequired };
+        return { success: true, mode: mode, url: ewsUrl, authMode: authMode, externalMailboxServer: extHost, ewsSupportedSchemas: ewsSupportedSchemas, userNameRequired: userNameRequired };
     }
 }
