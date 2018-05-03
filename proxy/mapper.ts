@@ -76,8 +76,8 @@ export function copyApiEventToAppointment(rawEvent: OfficeApiEvent, appointment:
     }
 
     if (rawEvent.recurrence) {
-        //Recurrence is not typed correctly....
-        if (rawEvent.recurrence.pattern) {
+        //Set Recurrence is not typed correctly....
+        if (rawEvent.recurrence.pattern && rawEvent.recurrence.range) {
             if (rawEvent.recurrence.pattern.type === RecurrencePatternType.Daily) {
                 //@ts-ignore
                 appointment.Recurrence = new Recurrence.DailyPattern(new DateTime(rawEvent.recurrence.range.startDate), rawEvent.recurrence.pattern.interval);
@@ -99,14 +99,11 @@ export function copyApiEventToAppointment(rawEvent: OfficeApiEvent, appointment:
                 appointment.Recurrence = new Recurrence.YearlyPattern(new DateTime(rawEvent.recurrence.range.startDate), rawEvent.recurrence.pattern.month, rawEvent.recurrence.pattern.dayOfMonth);
             }
         }
-
-        if (rawEvent.recurrence.range) {
-            appointment.Recurrence.startDate = new DateTime(rawEvent.recurrence.range.startDate);
-            if (rawEvent.recurrence.range.type === RecurrenceRangeType.Numbered) {
-                appointment.Recurrence.numberOfOccurrences = rawEvent.recurrence.range.numberOfOccurrences;
-            } else if (rawEvent.recurrence.range.type === RecurrenceRangeType.EndDate) {
-                appointment.Recurrence.endDate = new DateTime(rawEvent.recurrence.range.endDate);
-            }
+        //Set Recurrence Range
+        if (rawEvent.recurrence.range.type === RecurrenceRangeType.Numbered) {
+            appointment.Recurrence.numberOfOccurrences = rawEvent.recurrence.range.numberOfOccurrences;
+        } else if (rawEvent.recurrence.range.type === RecurrenceRangeType.EndDate) {
+            appointment.Recurrence.endDate = new DateTime(rawEvent.recurrence.range.endDate);
         }
     }
 }
