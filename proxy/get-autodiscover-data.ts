@@ -8,7 +8,7 @@ import { isNullOrEmpty } from './mapper';
 export class GetAutodiscoverDataRequest {
 
     async execute(env: Environment, params: { email: string }) {
-        let userEmail = params.email;
+        let userEmail = params.email || env.ewsUser;
         let userName = env.ewsUser;
         let password = new Buffer(env.ewsPassword, 'base64').toString();
 
