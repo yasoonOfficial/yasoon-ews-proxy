@@ -22,6 +22,7 @@ import { Monkey } from './extensions/Monkey';
 import { DeleteCalendarRequest } from './proxy/delete-calendar';
 import { GetSingleCalendarEventRequest } from './proxy/get-single-event';
 import { GetOwnUserRequest } from './proxy/get-own-user';
+import { FindGroupRequest } from './proxy/find-group';
 
 const customHeaders = [
     EWS_AUTH_TYPE_HEADER,
@@ -152,6 +153,18 @@ app.patch('/user/:email/calendars/:id/events/:eventId', requestWrapper(async (re
     res.status(200).send({});
 }));
 
+app.post('/user/:email/calendars/:id/events/:eventId/delete', requestWrapper(async (req: express.Request, res: express.Response) => {
+    let deleteRequest = new DeleteEventRequest();
+    await deleteRequest.execute(getEnvFromHeader(req, secret), {
+        eventId: req.params.eventId,
+        sendCancellations: req.body.sendCancellations,
+        entireSeries: req.body.entireSeries,
+        cancellationMessage: req.body.cancellationMessage,
+        type: req.body.type
+    });
+    res.status(200).send({});
+}));
+
 app.get('/user/:email/calendars/:id/free-busy', requestWrapper(async (req: express.Request, res: express.Response) => {
     if (req.params.id !== 'main')
         return res.status(400).send();
@@ -182,6 +195,15 @@ app.post('/user/:email/calendars', requestWrapper(async (req: express.Request, r
     res.send(result);
 }));
 
+app.delete('/user/:email/calendars/:id/delete', requestWrapper(async (req: express.Request, res: express.Response) => {
+    let deleteRequest = new DeleteCalendarRequest();
+    await deleteRequest.execute(getEnvFromHeader(req, secret), {
+        calendarId: req.params.id,
+        email: req.params.email
+    });
+    res.status(204).send({});
+}));
+
 app.post('/user/:email/create-wunderbar-link', requestWrapper(async (req: express.Request, res: express.Response) => {
     let createWunderlink = new CreateWunderbarLinkRequest();
     await createWunderlink.execute(getEnvFromHeader(req, secret), req.params, req.body);
@@ -191,29 +213,14 @@ app.post('/user/:email/create-wunderbar-link', requestWrapper(async (req: expres
     });
 }));
 
+app.get('/groups', requestWrapper(async (req: express.Request, res: express.Response) => {
+    let findGroups = new FindGroupRequest();
+    let result = await findGroups.execute(getEnvFromHeader(req, secret), req.params);
+    res.send(result);
+}));
+
 app.get('/', (req, res) => {
     res.status(200).send('You have been served. Nothing to see, please move on. <br/>The Job (⌐■_■)');
 });
-
-app.post('/user/:email/calendars/:id/events/:eventId/delete', requestWrapper(async (req: express.Request, res: express.Response) => {
-    let deleteRequest = new DeleteEventRequest();
-    await deleteRequest.execute(getEnvFromHeader(req, secret), {
-        eventId: req.params.eventId,
-        sendCancellations: req.body.sendCancellations,
-        entireSeries: req.body.entireSeries,
-        cancellationMessage: req.body.cancellationMessage,
-        type: req.body.type
-    });
-    res.status(200).send({});
-}));
-
-app.delete('/user/:email/calendars/:id/delete', requestWrapper(async (req: express.Request, res: express.Response) => {
-    let deleteRequest = new DeleteCalendarRequest();
-    await deleteRequest.execute(getEnvFromHeader(req, secret), {
-        calendarId: req.params.id,
-        email: req.params.email
-    });
-    res.status(204).send({});
-}));
 
 export = app;

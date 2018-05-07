@@ -10,8 +10,11 @@ export class GetUserImageRequest {
         service.Url = new Uri(env.ewsUrl);
         applyCredentials(service, env);
 
-        var request = <any>new GetUserPhotoRequest(service, null);
+        //@ts-ignore
+        var request = new GetUserPhotoRequest(service, null);
+        //@ts-ignore
         request.EmailAddress = params.email;
+        //@ts-ignore
         request.Size = 360;
 
         let response = await request.Execute();
