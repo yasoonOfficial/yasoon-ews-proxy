@@ -1,28 +1,29 @@
-import * as express from 'express';
 import * as bodyParser from 'body-parser';
-import { SearchUserRequest } from './proxy/search-user';
-import { getEnvFromHeader, requestWrapper } from './proxy/helper';
+import { EwsLogging } from 'ews-javascript-api';
+import * as express from 'express';
+import { Monkey } from './extensions/Monkey';
+import { EWS_AUTH_TYPE_HEADER, EWS_PASSWORD_HEADER, EWS_TOKEN_HEADER, EWS_URL_HEADER, EWS_USER_HEADER, PROXY_SECRET_HEADER } from './model/constants';
+import { CreateCalendarRequest } from './proxy/create-calendar';
+import { CreateEventRequest } from './proxy/create-event';
+import { CreateGroupRequest } from './proxy/create-group';
+import { CreateWunderbarLinkRequest } from './proxy/create-wunderbar-link';
+import { DeleteCalendarRequest } from './proxy/delete-calendar';
+import { DeleteEventRequest } from './proxy/delete-event';
+import { FindGroupRequest } from './proxy/find-group';
+import { GetAutodiscoverDataRequest } from './proxy/get-autodiscover-data';
+import { GetCalendarsRequest } from './proxy/get-calendars';
+import { GetCategoriesRequest } from './proxy/get-categories';
+import { GetEventsRequest } from './proxy/get-events';
+import { GetFreeBusyEventsRequest } from './proxy/get-free-busy-events';
+import { GetOwnUserRequest } from './proxy/get-own-user';
+import { GetPermissionsRequest } from './proxy/get-permissions';
+import { GetPublicFolderMailboxRequest } from './proxy/get-publicfolder-mailbox';
+import { GetSingleCalendarEventRequest } from './proxy/get-single-event';
 import { GetUserRequest } from './proxy/get-user';
 import { GetUserImageRequest } from './proxy/get-user-image';
-import { GetCalendarsRequest } from './proxy/get-calendars';
-import { GetEventsRequest } from './proxy/get-events';
-import { CreateEventRequest } from './proxy/create-event';
+import { getEnvFromHeader, requestWrapper } from './proxy/helper';
+import { SearchUserRequest } from './proxy/search-user';
 import { UpdateEventRequest } from './proxy/update-event';
-import { GetFreeBusyEventsRequest } from './proxy/get-free-busy-events';
-import { GetPermissionsRequest } from './proxy/get-permissions';
-import { CreateCalendarRequest } from './proxy/create-calendar';
-import { CreateWunderbarLinkRequest } from './proxy/create-wunderbar-link';
-import { GetPublicFolderMailboxRequest } from './proxy/get-publicfolder-mailbox';
-import { GetAutodiscoverDataRequest } from './proxy/get-autodiscover-data';
-import { EwsLogging } from 'ews-javascript-api';
-import { EWS_AUTH_TYPE_HEADER, EWS_TOKEN_HEADER, EWS_URL_HEADER, EWS_USER_HEADER, EWS_PASSWORD_HEADER, PROXY_SECRET_HEADER } from './model/constants';
-import { DeleteEventRequest } from './proxy/delete-event';
-import { GetCategoriesRequest } from './proxy/get-categories';
-import { Monkey } from './extensions/Monkey';
-import { DeleteCalendarRequest } from './proxy/delete-calendar';
-import { GetSingleCalendarEventRequest } from './proxy/get-single-event';
-import { GetOwnUserRequest } from './proxy/get-own-user';
-import { FindGroupRequest } from './proxy/find-group';
 
 const customHeaders = [
     EWS_AUTH_TYPE_HEADER,
@@ -216,6 +217,12 @@ app.post('/user/:email/create-wunderbar-link', requestWrapper(async (req: expres
 app.get('/groups', requestWrapper(async (req: express.Request, res: express.Response) => {
     let findGroups = new FindGroupRequest();
     let result = await findGroups.execute(getEnvFromHeader(req, secret), req.params);
+    res.send(result);
+}));
+
+app.post('/groups', requestWrapper(async (req: express.Request, res: express.Response) => {
+    let createGroup = new CreateGroupRequest();
+    let result = await createGroup.execute(getEnvFromHeader(req, secret), req.body);
     res.send(result);
 }));
 
