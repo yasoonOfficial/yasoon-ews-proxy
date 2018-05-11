@@ -127,11 +127,11 @@ export function mapAppointmentToApiEvent(item: Appointment, additionalProps?: Pr
         result = {
             id: item.Id.UniqueId,
             start: {
-                dateTime: item.Start.ToISOString(),
+                dateTime: getOfficeDateTime(item.Start, item.StartTimeZone, item.IsAllDayEvent),
                 timeZone: 'UTC'
             },
             end: {
-                dateTime: item.End.ToISOString(),
+                dateTime: getOfficeDateTime(item.End, item.StartTimeZone, item.IsAllDayEvent),
                 timeZone: 'UTC'
             },
             type: 'singleInstance',
@@ -142,16 +142,15 @@ export function mapAppointmentToApiEvent(item: Appointment, additionalProps?: Pr
             showAs: getFreeBusyStatusNewName(LegacyFreeBusyStatus[item.LegacyFreeBusyStatus])
         };
     } else {
-
         result = {
             id: item.Id.UniqueId,
             subject: item.Subject,
             start: {
-                dateTime: item.Start.ToISOString(),
+                dateTime: getOfficeDateTime(item.Start, item.StartTimeZone, item.IsAllDayEvent),
                 timeZone: 'UTC'
             },
             end: {
-                dateTime: item.End.ToISOString(),
+                dateTime: getOfficeDateTime(item.End, item.StartTimeZone, item.IsAllDayEvent),
                 timeZone: 'UTC'
             },
             location: { displayName: item.Location },
@@ -226,6 +225,28 @@ export function mapAppointmentToApiEvent(item: Appointment, additionalProps?: Pr
                 result[prop.Name[0].toLowerCase() + prop.Name.substring(1)] = outParam.outValue;
             }
         });
+    }
+
+    return result;
+}
+
+export function getOfficeDateTime(date: DateTime, timezone: TimeZoneInfo, isAllDay: boolean): string {
+    let result: string;
+    // Some background.. This is mimicking the Graph API behavior for all day events
+    // => The just return an UTC date @00:00:00, which is technically not the same
+    // that is saved on Exchange, but much easier to consume. So we do the same ->
+    // Interpret the dateTime of the all-day event in the respective timezone, which
+    // should lead to a date @00:00:00. Then, format this as a local date time and
+    // tell the consumer it's in UTC
+    if (isAllDay) {
+        let tz = timezone.IanaId;
+        let momentDate = moment.utc(date.ToLocalTime().ToISOString());
+        result = moment.utc(momentDate).tz(tz).format("YYYY-MM-DDTHH:mm:ss");
+
+    } else {
+        // To-Do: Actually supply the correct timezone.. We need this to keep the events
+        // in the correct timezone for updates
+        result = moment(date.ToISOString()).format("YYYY-MM-DDTHH:mm:ss");
     }
 
     return result;
