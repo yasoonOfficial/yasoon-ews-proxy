@@ -35,6 +35,7 @@ const customHeaders = [
 ];
 
 let app = express();
+let router = express.Router();
 app.use(bodyParser.json());
 app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -54,42 +55,42 @@ EwsLogging.DebugLogEnabled = false;
 //Fix for https://github.com/gautamsi/ews-javascript-api/pull/219
 new Monkey().patch();
 
-app.post('/logging', (req: express.Request, res: express.Response) => {
+router.post('/logging', (req: express.Request, res: express.Response) => {
     EwsLogging.DebugLogEnabled = req.body.enabled;
     res.status(200).send();
 });
 
-app.get('/autodiscover/:email', requestWrapper(async (req: express.Request, res: express.Response) => {
+router.get('/autodiscover/:email', requestWrapper(async (req: express.Request, res: express.Response) => {
     let getAutodiscover = new GetAutodiscoverDataRequest();
     let result = await getAutodiscover.execute(getEnvFromHeader(req, secret), req.params);
     res.send(result);
 }));
 
-app.get('/user/:email/publicFolderMailbox', requestWrapper(async (req: express.Request, res: express.Response) => {
+router.get('/user/:email/publicFolderMailbox', requestWrapper(async (req: express.Request, res: express.Response) => {
     let getPublicFolder = new GetPublicFolderMailboxRequest();
     let result = await getPublicFolder.execute(getEnvFromHeader(req, secret), req.params);
     res.send(result);
 }));
 
-app.get('/user/search', requestWrapper(async (req: express.Request, res: express.Response) => {
+router.get('/user/search', requestWrapper(async (req: express.Request, res: express.Response) => {
     let searchUser = new SearchUserRequest();
     let result = await searchUser.execute(getEnvFromHeader(req, secret), req.query);
     res.send(result);
 }));
 
-app.get('/user/me', requestWrapper(async (req: express.Request, res: express.Response) => {
+router.get('/user/me', requestWrapper(async (req: express.Request, res: express.Response) => {
     let getUser = new GetOwnUserRequest();
     let result = await getUser.execute(getEnvFromHeader(req, secret));
     res.send(result);
 }));
 
-app.get('/user/:email', requestWrapper(async (req: express.Request, res: express.Response) => {
+router.get('/user/:email', requestWrapper(async (req: express.Request, res: express.Response) => {
     let getUser = new GetUserRequest();
     let result = await getUser.execute(getEnvFromHeader(req, secret), req.params);
     res.send(result);
 }));
 
-app.get('/user/:email/photo', requestWrapper(async (req: express.Request, res: express.Response) => {
+router.get('/user/:email/photo', requestWrapper(async (req: express.Request, res: express.Response) => {
     let getUserImage = new GetUserImageRequest();
     let result = await getUserImage.execute(getEnvFromHeader(req, secret), req.params);
 
@@ -97,19 +98,19 @@ app.get('/user/:email/photo', requestWrapper(async (req: express.Request, res: e
     res.send(result.content);
 }));
 
-app.get('/user/:email/calendars', requestWrapper(async (req: express.Request, res: express.Response) => {
+router.get('/user/:email/calendars', requestWrapper(async (req: express.Request, res: express.Response) => {
     let getUserCalendar = new GetCalendarsRequest();
     let result = await getUserCalendar.execute(getEnvFromHeader(req, secret), req.params);
     res.send(result);
 }));
 
-app.get('/user/:email/categories', requestWrapper(async (req: express.Request, res: express.Response) => {
+router.get('/user/:email/categories', requestWrapper(async (req: express.Request, res: express.Response) => {
     let getCategories = new GetCategoriesRequest();
     let result = await getCategories.execute(getEnvFromHeader(req, secret), req.params);
     res.send(result);
 }));
 
-app.get('/user/:email/calendars/:id/events', requestWrapper(async (req: express.Request, res: express.Response) => {
+router.get('/user/:email/calendars/:id/events', requestWrapper(async (req: express.Request, res: express.Response) => {
     let getUserCalendarEvents = new GetEventsRequest();
     let result = await getUserCalendarEvents.execute(getEnvFromHeader(req, secret), {
         calendarId: req.params.id,
@@ -121,7 +122,7 @@ app.get('/user/:email/calendars/:id/events', requestWrapper(async (req: express.
     res.send(result);
 }));
 
-app.get('/user/:email/calendars/:id/events/:eventId', requestWrapper(async (req: express.Request, res: express.Response) => {
+router.get('/user/:email/calendars/:id/events/:eventId', requestWrapper(async (req: express.Request, res: express.Response) => {
     let getSingleCalendarEvent = new GetSingleCalendarEventRequest();
     let result = await getSingleCalendarEvent.execute(getEnvFromHeader(req, secret), {
         email: req.params.email,
@@ -132,7 +133,7 @@ app.get('/user/:email/calendars/:id/events/:eventId', requestWrapper(async (req:
     res.send(result);
 }));
 
-app.post('/user/:email/calendars/:id/events', requestWrapper(async (req: express.Request, res: express.Response) => {
+router.post('/user/:email/calendars/:id/events', requestWrapper(async (req: express.Request, res: express.Response) => {
     let createEvent = new CreateEventRequest();
     let result = await createEvent.execute(getEnvFromHeader(req, secret), {
         calendarId: req.params.id,
@@ -142,7 +143,7 @@ app.post('/user/:email/calendars/:id/events', requestWrapper(async (req: express
     res.send(result);
 }));
 
-app.patch('/user/:email/calendars/:id/events/:eventId', requestWrapper(async (req: express.Request, res: express.Response) => {
+router.patch('/user/:email/calendars/:id/events/:eventId', requestWrapper(async (req: express.Request, res: express.Response) => {
     let updateEvent = new UpdateEventRequest();
     await updateEvent.execute(getEnvFromHeader(req, secret), {
         calendarId: req.params.id,
@@ -154,7 +155,7 @@ app.patch('/user/:email/calendars/:id/events/:eventId', requestWrapper(async (re
     res.status(200).send({});
 }));
 
-app.post('/user/:email/calendars/:id/events/:eventId/delete', requestWrapper(async (req: express.Request, res: express.Response) => {
+router.post('/user/:email/calendars/:id/events/:eventId/delete', requestWrapper(async (req: express.Request, res: express.Response) => {
     let deleteRequest = new DeleteEventRequest();
     await deleteRequest.execute(getEnvFromHeader(req, secret), {
         eventId: req.params.eventId,
@@ -166,7 +167,7 @@ app.post('/user/:email/calendars/:id/events/:eventId/delete', requestWrapper(asy
     res.status(200).send({});
 }));
 
-app.get('/user/:email/calendars/:id/free-busy', requestWrapper(async (req: express.Request, res: express.Response) => {
+router.get('/user/:email/calendars/:id/free-busy', requestWrapper(async (req: express.Request, res: express.Response) => {
     if (req.params.id !== 'main')
         return res.status(400).send();
 
@@ -180,7 +181,7 @@ app.get('/user/:email/calendars/:id/free-busy', requestWrapper(async (req: expre
     res.send(result);
 }));
 
-app.get('/user/:email/calendars/:id/effective-permissions', requestWrapper(async (req: express.Request, res: express.Response) => {
+router.get('/user/:email/calendars/:id/effective-permissions', requestWrapper(async (req: express.Request, res: express.Response) => {
     let getPermissions = new GetPermissionsRequest();
     let result = await getPermissions.execute(getEnvFromHeader(req, secret), {
         calendarId: req.params.id,
@@ -190,13 +191,13 @@ app.get('/user/:email/calendars/:id/effective-permissions', requestWrapper(async
     res.send(result);
 }));
 
-app.post('/user/:email/calendars', requestWrapper(async (req: express.Request, res: express.Response) => {
+router.post('/user/:email/calendars', requestWrapper(async (req: express.Request, res: express.Response) => {
     let createCalendar = new CreateCalendarRequest();
     let result = await createCalendar.execute(getEnvFromHeader(req, secret), req.params, req.body);
     res.send(result);
 }));
 
-app.delete('/user/:email/calendars/:id/delete', requestWrapper(async (req: express.Request, res: express.Response) => {
+router.delete('/user/:email/calendars/:id/delete', requestWrapper(async (req: express.Request, res: express.Response) => {
     let deleteRequest = new DeleteCalendarRequest();
     await deleteRequest.execute(getEnvFromHeader(req, secret), {
         calendarId: req.params.id,
@@ -205,7 +206,7 @@ app.delete('/user/:email/calendars/:id/delete', requestWrapper(async (req: expre
     res.status(204).send({});
 }));
 
-app.post('/user/:email/create-wunderbar-link', requestWrapper(async (req: express.Request, res: express.Response) => {
+router.post('/user/:email/create-wunderbar-link', requestWrapper(async (req: express.Request, res: express.Response) => {
     let createWunderlink = new CreateWunderbarLinkRequest();
     await createWunderlink.execute(getEnvFromHeader(req, secret), req.params, req.body);
 
@@ -214,20 +215,21 @@ app.post('/user/:email/create-wunderbar-link', requestWrapper(async (req: expres
     });
 }));
 
-app.get('/groups', requestWrapper(async (req: express.Request, res: express.Response) => {
+router.get('/groups', requestWrapper(async (req: express.Request, res: express.Response) => {
     let findGroups = new FindGroupRequest();
     let result = await findGroups.execute(getEnvFromHeader(req, secret), req.params);
     res.send(result);
 }));
 
-app.post('/groups', requestWrapper(async (req: express.Request, res: express.Response) => {
+router.post('/groups', requestWrapper(async (req: express.Request, res: express.Response) => {
     let createGroup = new CreateGroupRequest();
     let result = await createGroup.execute(getEnvFromHeader(req, secret), req.body);
     res.send(result);
 }));
 
-app.get('/', (req, res) => {
+router.get('/', (req, res) => {
     res.status(200).send('You have been served. Nothing to see, please move on. <br/>The Job (⌐■_■)');
 });
 
+app.use('/v2', router);
 export = app;
