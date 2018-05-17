@@ -96,6 +96,21 @@
   dependencies:
     "@types/node" "*"
 
+"@yasoon/dns-all-fetch@^1.2.4":
+  version "1.2.4"
+  resolved "https://registry.yasoon.org:443/@yasoon%2fdns-all-fetch/-/dns-all-fetch-1.2.4.tgz#7eb9fd81d03d75ff8b1b8e7b023ed707679efd16"
+  dependencies:
+    biskviit "1.0.1"
+    encoding "0.1.12"
+
+"@yasoon/ews-javascript-api-auth@^1.2.1":
+  version "1.2.2"
+  resolved "https://registry.yasoon.org:443/@yasoon%2fews-javascript-api-auth/-/ews-javascript-api-auth-1.2.2.tgz#fa2843613104a2a9f93fcae1b146b4419eb280cf"
+  dependencies:
+    "@yasoon/dns-all-fetch" "^1.2.4"
+    bluebird "^3.4.6"
+    ntlm-client "git+https://git@github.com/gautamsi/node-ntlm-client.git"
+
 abbrev@1:
   version "1.1.1"
   resolved "https://registry.yasoon.org:443/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
@@ -626,14 +641,6 @@ etag@~1.8.1:
   version "1.8.1"
   resolved "https://registry.yarnpkg.com/etag/-/etag-1.8.1.tgz#41ae2eeb65efa62268aebfea83ac7d79299b0887"
 
-ews-javascript-api-auth@^1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/ews-javascript-api-auth/-/ews-javascript-api-auth-1.2.1.tgz#54ac97e4fe502ddbd5b5104da6fb5c934f3d2ace"
-  dependencies:
-    bluebird "^3.4.6"
-    fetch "^1.0.1"
-    ntlm-client "git+https://git@github.com/gautamsi/node-ntlm-client.git"
-
 ews-javascript-api@^0.9.2:
   version "0.9.2"
   resolved "https://registry.yarnpkg.com/ews-javascript-api/-/ews-javascript-api-0.9.2.tgz#a475cd58bf506668eea5a8dd888e01802d05bdca"
@@ -728,7 +735,7 @@ fast-levenshtein@~2.0.4:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/fast-levenshtein/-/fast-levenshtein-2.0.6.tgz#3d8a5c66883a16a30ca8643e851f19baa7797917"
 
-fetch@^1.0.1, fetch@^1.1.0:
+fetch@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/fetch/-/fetch-1.1.0.tgz#0a8279f06be37f9f0ebb567560a30a480da59a2e"
   dependencies:

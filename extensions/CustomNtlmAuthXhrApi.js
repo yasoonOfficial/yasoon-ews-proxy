@@ -1,7 +1,7 @@
 "use strict";
-var fetch_1 = require("fetch");
+var fetch_1 = require("@yasoon/dns-all-fetch");
 var Promise = require("bluebird");
-var utils_1 = require("ews-javascript-api-auth/src/utils");
+var utils_1 = require("@yasoon/ews-javascript-api-auth/src/utils");
 var http_1 = require('http');
 var https_1 = require("https");
 var _a = require("ntlm-client"), createType1Message = _a.createType1Message, decodeType2Message = _a.decodeType2Message, createType3Message = _a.createType3Message; //ref: has NTLM v2 support // info: also possible to use this package in node.
@@ -45,6 +45,7 @@ var ntlmAuthXhrApi = (function () {
             url: xhroptions.url,
             //payload: xhroptions.data,
             headers: xhroptions.headers || {},
+            asyncDnsLoookup: true,
             method: 'GET',
             agentHttps: new https_1.Agent({ keepAlive: true, rejectUnauthorized: !this.allowUntrustedCertificate }),
             agentHttp: new http_1.Agent({ keepAlive: true, rejectUnauthorized: !this.allowUntrustedCertificate })
@@ -85,6 +86,7 @@ var ntlmAuthXhrApi = (function () {
             url: xhroptions.url,
             //payload: xhroptions.data,
             headers: xhroptions.headers,
+            asyncDnsLoookup: true,
             method: 'GET',
             agentHttps: new https_1.Agent({ keepAlive: true, rejectUnauthorized: !this.allowUntrustedCertificate }),
             agentHttp: new http_1.Agent({ keepAlive: true, rejectUnauthorized: !this.allowUntrustedCertificate })
