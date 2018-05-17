@@ -1,9 +1,8 @@
+import { EnumValues } from "enum-values/src/enumValues";
+import { Appointment, AppointmentType, AttendeeCollection, BodyType, DateTime, DateTimeKind, ExtendedPropertyDefinition, IOutParam, LegacyFreeBusyStatus, MeetingResponseType, MessageBody, PropertyDefinitionBase, StringList, TimeZoneInfo } from "ews-javascript-api";
 import * as moment from 'moment-timezone';
 import * as xmlEscape from 'xml-escape';
-
-import { OfficeApiEvent, EventAvailability } from "../model/office";
-import { Appointment, BodyType, MessageBody, StringList, DateTime, DateTimeKind, AttendeeCollection, MeetingResponseType, LegacyFreeBusyStatus, TimeZoneInfo, AppointmentType, PropertyDefinitionBase, ExtendedProperty, ExtendedPropertyDefinition, IOutParam } from "ews-javascript-api";
-import { EnumValues } from "enum-values/src/enumValues";
+import { EventAvailability, OfficeApiEvent } from "../model/office";
 
 export function copyApiEventToAppointment(rawEvent: OfficeApiEvent, appointment: Appointment) {
     //Let the mapping begin!
