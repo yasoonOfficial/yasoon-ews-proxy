@@ -1,9 +1,9 @@
+import { EnumValues } from "enum-values/src/enumValues";
+import { Appointment, AppointmentSchema, AppointmentType, AttendeeCollection, BodyType, DateTime, DateTimeKind, DayOfTheWeek, DayOfTheWeekIndex, ExtendedPropertyDefinition, IOutParam, LegacyFreeBusyStatus, MeetingResponseType, MessageBody, PropertyDefinition, PropertyDefinitionBase, Recurrence, StringList, TimeZoneInfo } from "ews-javascript-api";
 import * as moment from 'moment-timezone';
 import * as xmlEscape from 'xml-escape';
+import { EventAvailability, OfficeApiEvent, RecurrencePatternType, RecurrenceRangeType } from "../model/office";
 
-import { Appointment, BodyType, MessageBody, StringList, DateTime, DateTimeKind, AttendeeCollection, MeetingResponseType, LegacyFreeBusyStatus, TimeZoneInfo, AppointmentType, PropertyDefinitionBase, ExtendedPropertyDefinition, IOutParam, DayOfTheWeek, Recurrence, DayOfTheWeekIndex, PropertyDefinition, AppointmentSchema } from "ews-javascript-api";
-import { OfficeApiEvent, EventAvailability, RecurrencePatternType, RecurrenceRangeType } from "../model/office";
-import { EnumValues } from "enum-values/src/enumValues";
 //import { raw } from 'body-parser';
 
 export function copyApiEventToAppointment(rawEvent: OfficeApiEvent, appointment: Appointment) {
@@ -161,7 +161,7 @@ export function mapAppointmentToApiEvent(item: Appointment, additionalProps?: Pr
             seriesMasterId: (isSeriesItem(item)) ? "masterFor:" + item.Id.UniqueId : undefined,
             sensitivity: <any>item.Sensitivity,
             isMeeting: item.IsMeeting
-        }
+        };
 
         if (item.GetLoadedPropertyDefinitions().find((p: PropertyDefinition) => p.Name === AppointmentSchema.WebClientReadFormQueryString.Name)) {
             let webLink = '';
@@ -174,19 +174,19 @@ export function mapAppointmentToApiEvent(item: Appointment, additionalProps?: Pr
             result.webLink = webLink;
         }
 
-        if (this.hasProperty(item, AppointmentSchema.ParentFolderId)) {
+        if (hasProperty(item, AppointmentSchema.ParentFolderId)) {
             result.calendarId = item.ParentFolderId.UniqueId;
         }
 
-        if (this.hasProperty(item, AppointmentSchema.IsReminderSet)) {
+        if (hasProperty(item, AppointmentSchema.IsReminderSet)) {
             result.isReminderOn = item.IsReminderSet;
         }
 
-        if (this.hasProperty(item, AppointmentSchema.ReminderMinutesBeforeStart)) {
+        if (hasProperty(item, AppointmentSchema.ReminderMinutesBeforeStart)) {
             result.reminderMinutesBeforeStart = item.ReminderMinutesBeforeStart;
         }
 
-        if (this.hasProperty(item, AppointmentSchema.Organizer)) {
+        if (hasProperty(item, AppointmentSchema.Organizer)) {
             result.organizer = ({
                 emailAddress: {
                     name: item.Organizer.Name,
@@ -195,7 +195,7 @@ export function mapAppointmentToApiEvent(item: Appointment, additionalProps?: Pr
             });
         }
 
-        if (this.hasProperty(item, AppointmentSchema.Body.Name)) {
+        if (hasProperty(item, AppointmentSchema.Body)) {
             result.body = ({
                 contentType: EnumValues.getNameFromValue(BodyType, item.Body.BodyType),
                 content: item.Body.Text
@@ -209,7 +209,7 @@ export function mapAppointmentToApiEvent(item: Appointment, additionalProps?: Pr
             result.attendees = all;
         }
 
-        if (this.hasProperty(item, AppointmentSchema.Body.Name) && item.Categories.Count > 0) {
+        if (hasProperty(item, AppointmentSchema.Body) && item.Categories.Count > 0) {
             result.categories = item.Categories.GetEnumerator();
         }
     }
