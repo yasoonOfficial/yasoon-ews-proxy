@@ -1,7 +1,7 @@
-import { Environment } from "../model/proxy";
-import { ExchangeService, Uri, FolderId, WellKnownFolderName, Mailbox, ExchangeVersion, TimeZoneInfo, PropertyDefinitionBase, ItemId, Appointment } from "ews-javascript-api";
-import { applyCredentials } from "../proxy/helper";
+import { Appointment, AppointmentSchema, BasePropertySet, ExchangeService, ExchangeVersion, FolderId, ItemId, Mailbox, PropertyDefinitionBase, PropertySet, TimeZoneInfo, Uri, WellKnownFolderName } from "ews-javascript-api";
 import { mapAppointmentToApiEvent } from "..";
+import { Environment } from "../model/proxy";
+import { applyCredentials } from "../proxy/helper";
 
 export interface GetSingleCalendarEventParams {
     email: string;
@@ -30,7 +30,8 @@ export class GetSingleCalendarEventRequest {
         }
 
         try {
-            let item = await Appointment.Bind(service, new ItemId(eventId));
+            let propSet = new PropertySet(BasePropertySet.FirstClassProperties, AppointmentSchema.StartTimeZone, AppointmentSchema.EndTimeZone);
+            let item = await Appointment.Bind(service, new ItemId(eventId), propSet);
 
             if (item == null)
                 return null;
