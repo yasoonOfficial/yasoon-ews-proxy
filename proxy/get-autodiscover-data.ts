@@ -1,8 +1,8 @@
-import { Environment } from "../model/proxy";
-import { validateAutodiscoverRedirection } from "../proxy/helper";
-import { AutodiscoverService, GetUserSettingsResponse, UserSettingName, ExchangeService, Uri, WebCredentials, ExchangeVersion, ResolveNameSearchLocation, ExchangeServiceBase } from "ews-javascript-api";
+import { AutodiscoverService, ExchangeService, ExchangeServiceBase, ExchangeVersion, GetUserSettingsResponse, ResolveNameSearchLocation, Uri, UserSettingName, WebCredentials } from "ews-javascript-api";
 import { AutodiscoverService as CustomAutodiscoverService } from '../extensions/CustomAutodiscoverService';
 import { ntlmAuthXhrApi } from "../extensions/CustomNtlmAuthXhrApi";
+import { Environment } from "../model/proxy";
+import { validateAutodiscoverRedirection } from "../proxy/helper";
 import { isNullOrEmpty } from './mapper';
 
 export class GetAutodiscoverDataRequest {
@@ -21,22 +21,13 @@ export class GetAutodiscoverDataRequest {
         let credentials = [
             {
                 authMode: 'basic',
-                userNameRequired: true,
-                apply: (svc: ExchangeServiceBase) => svc.Credentials = new WebCredentials(userName, password)
-            },
-            {
-                authMode: 'basic',
                 userNameRequired: false,
                 apply: (svc: ExchangeServiceBase) => svc.Credentials = new WebCredentials(userEmail, password)
             },
             {
-                authMode: 'ntlm',
+                authMode: 'basic',
                 userNameRequired: true,
-                apply: (svc: ExchangeServiceBase) => {
-                    svc.Credentials = null;
-                    svc.XHRApi = new ntlmAuthXhrApi(userName, password, true);
-                    svc.UseDefaultCredentials = true; //Bug... 
-                }
+                apply: (svc: ExchangeServiceBase) => svc.Credentials = new WebCredentials(userName, password)
             },
             {
                 authMode: 'ntlm',
@@ -47,6 +38,15 @@ export class GetAutodiscoverDataRequest {
                     svc.UseDefaultCredentials = true; //Bug... 
                 }
             },
+            {
+                authMode: 'ntlm',
+                userNameRequired: true,
+                apply: (svc: ExchangeServiceBase) => {
+                    svc.Credentials = null;
+                    svc.XHRApi = new ntlmAuthXhrApi(userName, password, true);
+                    svc.UseDefaultCredentials = true; //Bug... 
+                }
+            }
         ];
 
         let errors = [];
