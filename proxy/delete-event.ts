@@ -10,6 +10,7 @@ export interface DeleteEventParams {
     entireSeries: boolean;
     cancellationMessage: string;
     type: "delete" | "cancel";
+    doHardDelete: boolean;
 }
 
 export class DeleteEventRequest {
@@ -20,6 +21,7 @@ export class DeleteEventRequest {
         applyCredentials(service, env);
 
         let sendCancellationsMode = SendCancellationsMode.SendToNone;
+        let deleteMode = params.doHardDelete ? DeleteMode.HardDelete : DeleteMode.MoveToDeletedItems;
         if (params.sendCancellations === true)
             sendCancellationsMode = SendCancellationsMode.SendToAllAndSaveCopy;
 
@@ -30,7 +32,7 @@ export class DeleteEventRequest {
             appointment = await Appointment.Bind(service, new ItemId(params.eventId));
         }
         if (params.type === "delete") {
-            await appointment.Delete(DeleteMode.MoveToDeletedItems, sendCancellationsMode);
+            await appointment.Delete(deleteMode, sendCancellationsMode);
 
         } else if (params.type === "cancel") {
             if (appointment.IsMeeting && sendCancellationsMode === SendCancellationsMode.SendToAllAndSaveCopy) {
@@ -58,7 +60,7 @@ export class DeleteEventRequest {
             }
             else {
                 // The item isn't a meeting, so just delete it.
-                await appointment.Delete(DeleteMode.MoveToDeletedItems, sendCancellationsMode);
+                await appointment.Delete(deleteMode, sendCancellationsMode);
             }
         }
     }
