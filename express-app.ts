@@ -162,7 +162,8 @@ router.post('/user/:email/calendars/:id/events/:eventId/delete', requestWrapper(
         sendCancellations: req.body.sendCancellations,
         entireSeries: req.body.entireSeries,
         cancellationMessage: req.body.cancellationMessage,
-        type: req.body.type
+        type: req.body.type,
+        doHardDelete: req.body.doHardDelete ? req.body.doHardDelete : false
     });
     res.status(200).send({});
 }));
