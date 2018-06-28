@@ -125,8 +125,6 @@ router.get('/user/:email/calendars/:id/events', requestWrapper(async (req: expre
 router.get('/user/:email/calendars/:id/events/:eventId', requestWrapper(async (req: express.Request, res: express.Response) => {
     let getSingleCalendarEvent = new GetSingleCalendarEventRequest();
     let result = await getSingleCalendarEvent.execute(getEnvFromHeader(req, secret), {
-        email: req.params.email,
-        calendarId: req.params.id,
         eventId: req.params.eventId,
     });
 
