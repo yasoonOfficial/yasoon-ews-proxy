@@ -217,7 +217,7 @@ router.post('/user/:email/create-wunderbar-link', requestWrapper(async (req: exp
 
 router.get('/groups', requestWrapper(async (req: express.Request, res: express.Response) => {
     let findGroups = new FindGroupRequest();
-    let result = await findGroups.execute(getEnvFromHeader(req, secret), req.params);
+    let result = await findGroups.execute(getEnvFromHeader(req, secret), req.query);
     res.send(result);
 }));
 
