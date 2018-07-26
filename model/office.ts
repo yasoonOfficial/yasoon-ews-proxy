@@ -127,15 +127,15 @@ export interface RecurrenceRange {
 }
 
 export enum RecurrencePatternType {
-    Daily = 'Daily', Weekly = 'Weekly', AbsoluteMonthly = 'AbsoluteMonthly',
-    RelativeMonthly = 'RelativeMonthly', AbsoluteYearly = 'AbsoluteYearly',
-    RelativeYearly = 'RelativeYearly'
+    Daily = 'daily', Weekly = 'weekly', AbsoluteMonthly = 'absoluteMonthly',
+    RelativeMonthly = 'relativeMonthly', AbsoluteYearly = 'absoluteYearly',
+    RelativeYearly = 'relativeYearly'
 }
 
 export enum RecurrenceRangeType {
-    EndDate = 'EndDate', 
-    NoEnd = 'NoEnd', 
-    Numbered = 'Numbered'
+    EndDate = 'endDate',
+    NoEnd = 'noEnd',
+    Numbered = 'numbered'
 }
 
 export interface OfficeUser {
