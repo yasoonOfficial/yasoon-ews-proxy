@@ -239,7 +239,11 @@ export function getOfficeDateTime(date: DateTime, timezone: TimeZoneInfo, isAllD
     // should lead to a date @00:00:00. Then, format this as a local date time and
     // tell the consumer it's in UTC
     if (isAllDay) {
-        result = moment(date.ToISOString()).tz(timezone.IanaId).format("YYYY-MM-DDTHH:mm:ss");
+        //If no timezone is provided, its already UTC
+        if (timezone && timezone.IanaId)
+            result = moment(date.ToISOString()).tz(timezone.IanaId).format("YYYY-MM-DDTHH:mm:ss");
+        else
+            result = moment(date.ToISOString()).format("YYYY-MM-DDTHH:mm:ss");
     } else {
         // To-Do: Actually supply the correct timezone.. We need this to keep the events
         // in the correct timezone for updates

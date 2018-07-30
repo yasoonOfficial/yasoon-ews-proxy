@@ -32,6 +32,10 @@ export function applyCredentials(service: any, env: Environment) {
     }
 }
 
+export function decodeUrlId(id: string) {
+    return id.replace(new RegExp("[-]", "g"), "/").replace(new RegExp("[_]", "g"), "+");
+}
+
 export function getEnvFromHeader(req: express.Request, secret: string): Environment {
     if (secret && req.headers[PROXY_SECRET_HEADER] !== secret) {
         throw new Error('Invalid Secret');

@@ -21,7 +21,7 @@ import { GetPublicFolderMailboxRequest } from './proxy/get-publicfolder-mailbox'
 import { GetSingleCalendarEventRequest } from './proxy/get-single-event';
 import { GetUserRequest } from './proxy/get-user';
 import { GetUserImageRequest } from './proxy/get-user-image';
-import { getEnvFromHeader, requestWrapper } from './proxy/helper';
+import { getEnvFromHeader, requestWrapper, decodeUrlId } from './proxy/helper';
 import { SearchUserRequest } from './proxy/search-user';
 import { UpdateEventRequest } from './proxy/update-event';
 
@@ -113,7 +113,7 @@ router.get('/user/:email/categories', requestWrapper(async (req: express.Request
 router.get('/user/:email/calendars/:id/events', requestWrapper(async (req: express.Request, res: express.Response) => {
     let getUserCalendarEvents = new GetEventsRequest();
     let result = await getUserCalendarEvents.execute(getEnvFromHeader(req, secret), {
-        calendarId: req.params.id,
+        calendarId: decodeUrlId(req.params.id),
         email: req.params.email,
         startDate: req.query.startDate,
         endDate: req.query.endDate
@@ -125,7 +125,7 @@ router.get('/user/:email/calendars/:id/events', requestWrapper(async (req: expre
 router.get('/user/:email/calendars/:id/events/:eventId', requestWrapper(async (req: express.Request, res: express.Response) => {
     let getSingleCalendarEvent = new GetSingleCalendarEventRequest();
     let result = await getSingleCalendarEvent.execute(getEnvFromHeader(req, secret), {
-        eventId: req.params.eventId,
+        eventId: decodeUrlId(req.params.eventId),
     });
 
     res.send(result);
@@ -134,7 +134,7 @@ router.get('/user/:email/calendars/:id/events/:eventId', requestWrapper(async (r
 router.post('/user/:email/calendars/:id/events', requestWrapper(async (req: express.Request, res: express.Response) => {
     let createEvent = new CreateEventRequest();
     let result = await createEvent.execute(getEnvFromHeader(req, secret), {
-        calendarId: req.params.id,
+        calendarId: decodeUrlId(req.params.id),
         email: req.params.email
     }, req.body);
 
@@ -144,9 +144,9 @@ router.post('/user/:email/calendars/:id/events', requestWrapper(async (req: expr
 router.patch('/user/:email/calendars/:id/events/:eventId', requestWrapper(async (req: express.Request, res: express.Response) => {
     let updateEvent = new UpdateEventRequest();
     await updateEvent.execute(getEnvFromHeader(req, secret), {
-        calendarId: req.params.id,
+        calendarId: decodeUrlId(req.params.id),
         email: req.params.email,
-        eventId: req.params.eventId,
+        eventId: decodeUrlId(req.params.eventId),
         entireSeries: req.query.entireSeries === 'true'
     }, req.body);
 
@@ -156,7 +156,7 @@ router.patch('/user/:email/calendars/:id/events/:eventId', requestWrapper(async 
 router.post('/user/:email/calendars/:id/events/:eventId/delete', requestWrapper(async (req: express.Request, res: express.Response) => {
     let deleteRequest = new DeleteEventRequest();
     await deleteRequest.execute(getEnvFromHeader(req, secret), {
-        eventId: req.params.eventId,
+        eventId: decodeUrlId(req.params.eventId),
         sendCancellations: req.body.sendCancellations,
         entireSeries: req.body.entireSeries,
         cancellationMessage: req.body.cancellationMessage,
@@ -183,7 +183,7 @@ router.get('/user/:email/calendars/:id/free-busy', requestWrapper(async (req: ex
 router.get('/user/:email/calendars/:id/effective-permissions', requestWrapper(async (req: express.Request, res: express.Response) => {
     let getPermissions = new GetPermissionsRequest();
     let result = await getPermissions.execute(getEnvFromHeader(req, secret), {
-        calendarId: req.params.id,
+        calendarId: decodeUrlId(req.params.id),
         email: req.params.email
     });
 
@@ -199,7 +199,7 @@ router.post('/user/:email/calendars', requestWrapper(async (req: express.Request
 router.delete('/user/:email/calendars/:id/delete', requestWrapper(async (req: express.Request, res: express.Response) => {
     let deleteRequest = new DeleteCalendarRequest();
     await deleteRequest.execute(getEnvFromHeader(req, secret), {
-        calendarId: req.params.id,
+        calendarId: decodeUrlId(req.params.id),
         email: req.params.email
     });
     res.status(204).send({});
