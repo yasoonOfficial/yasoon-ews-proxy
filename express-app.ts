@@ -21,9 +21,11 @@ import { GetPublicFolderMailboxRequest } from './proxy/get-publicfolder-mailbox'
 import { GetSingleCalendarEventRequest } from './proxy/get-single-event';
 import { GetUserRequest } from './proxy/get-user';
 import { GetUserImageRequest } from './proxy/get-user-image';
-import { getEnvFromHeader, requestWrapper, decodeUrlId } from './proxy/helper';
+import { decodeUrlId, getEnvFromHeader, requestWrapper } from './proxy/helper';
 import { SearchUserRequest } from './proxy/search-user';
 import { UpdateEventRequest } from './proxy/update-event';
+//@ts-ignore
+import * as version from './version.json';
 
 const customHeaders = [
     EWS_AUTH_TYPE_HEADER,
@@ -228,6 +230,10 @@ router.post('/groups', requestWrapper(async (req: express.Request, res: express.
 
 router.get('/', (req, res) => {
     res.status(200).send('You have been served. Nothing to see, please move on. <br/>The Job (⌐■_■)');
+});
+
+router.get('/version', (req, res) => {
+    res.status(200).send(version);
 });
 
 app.use('/v2', router);

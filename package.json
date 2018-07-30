@@ -6,7 +6,7 @@
 	"typings": "./lib/index.d.ts",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"build": "rimraf dist && tsc && xcopy .\\node_modules .\\dist\\node_modules /i /s /q /h /y /c && xcopy .\\app.js .\\dist\\app.js*",
+		"build": "rimraf dist && tsc && xcopy .\\node_modules .\\dist\\node_modules /i /s /q /h /y /c && xcopy .\\app.js .\\dist\\app.js* && xcopy .\\version.json .\\dist\\version.json*",
 		"pkg": "pkg .\\dist\\app.js --out-path dist",
 		"replaceIcon": ".\\res\\ResourceHacker.exe -open .\\dist\\app-win.exe -save .\\dist\\ews-proxy.exe -action addoverwrite -res .\\res\\logo.ico -mask ICONGROUP,1,1033",
 		"replaceManifest": ".\\res\\ResourceHacker.exe -open .\\res\\res.rc -action compile -save .\\res\\res.res && .\\res\\ResourceHacker.exe -open .\\dist\\ews-proxy.exe -resource .\\res\\res.res -action addoverwrite -save .\\dist\\ews-proxy.exe",
