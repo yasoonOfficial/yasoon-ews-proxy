@@ -158,7 +158,7 @@ export function mapAppointmentToApiEvent(item: Appointment, additionalProps?: Pr
             //@ts-ignore
             showAs: getFreeBusyStatusNewName(LegacyFreeBusyStatus[item.LegacyFreeBusyStatus]),
             type: getAppointmentType(<any>item.AppointmentType),
-            seriesMasterId: (isSeriesItem(item)) ? "masterFor:" + item.Id.UniqueId : undefined,
+            seriesMasterId: (isSeriesItem(item)) ? item.Id.UniqueId : undefined,
             sensitivity: <any>item.Sensitivity,
             isMeeting: item.IsMeeting
         };
