@@ -1,5 +1,5 @@
 import { EnumValues } from "enum-values/src/enumValues";
-import { Appointment, AppointmentSchema, AppointmentType, AttendeeCollection, BodyType, DateTime, DateTimeKind, DayOfTheWeek, DayOfTheWeekIndex, ExtendedPropertyDefinition, IOutParam, LegacyFreeBusyStatus, MeetingResponseType, MessageBody, PropertyDefinition, PropertyDefinitionBase, Recurrence, StringList, TimeZoneInfo } from "ews-javascript-api";
+import { Appointment, AppointmentSchema, AppointmentType, AttendeeCollection, BasePropertySet, BodyType, DateTime, DateTimeKind, DayOfTheWeek, DayOfTheWeekIndex, ExtendedPropertyDefinition, IOutParam, LegacyFreeBusyStatus, MeetingResponseType, MessageBody, PropertyDefinition, PropertyDefinitionBase, PropertySet, Recurrence, StringList, TimeZoneInfo } from "ews-javascript-api";
 import * as moment from 'moment-timezone';
 import * as xmlEscape from 'xml-escape';
 import { EventAvailability, OfficeApiEvent, RecurrencePatternType, RecurrenceRangeType } from "../model/office";
@@ -116,7 +116,7 @@ export function mapDaysOfTheWeek(daysOfWeek): DayOfTheWeek[] {
     return daysOfWeekEnum;
 }
 
-export function mapAppointmentToApiEvent(item: Appointment, additionalProps?: PropertyDefinitionBase[]): OfficeApiEvent {
+export async function mapAppointmentToApiEvent(item: Appointment, additionalProps?: PropertyDefinitionBase[]): Promise<OfficeApiEvent> {
     if (!item)
         return null;
 
@@ -158,10 +158,15 @@ export function mapAppointmentToApiEvent(item: Appointment, additionalProps?: Pr
             //@ts-ignore
             showAs: getFreeBusyStatusNewName(LegacyFreeBusyStatus[item.LegacyFreeBusyStatus]),
             type: getAppointmentType(<any>item.AppointmentType),
-            seriesMasterId: (isSeriesItem(item)) ? item.Id.UniqueId : undefined,
             sensitivity: <any>item.Sensitivity,
             isMeeting: item.IsMeeting
         };
+
+        if (isSeriesItem(item)) {
+            let master = await Appointment.BindToRecurringMaster(item.Service, item.Id, new PropertySet(BasePropertySet.IdOnly));
+            if (master && master.Id)
+                result.seriesMasterId = master.Id.UniqueId;
+        }
 
         if (item.GetLoadedPropertyDefinitions().find((p: PropertyDefinition) => p.Name === AppointmentSchema.WebClientReadFormQueryString.Name)) {
             let webLink = '';

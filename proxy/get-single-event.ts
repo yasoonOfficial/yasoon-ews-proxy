@@ -1,7 +1,7 @@
 import { Appointment, AppointmentSchema, BasePropertySet, ExchangeService, ExchangeVersion, ItemId, PropertyDefinitionBase, PropertySet, TimeZoneInfo, Uri } from "ews-javascript-api";
-import { mapAppointmentToApiEvent } from "..";
 import { Environment } from "../model/proxy";
 import { applyCredentials } from "../proxy/helper";
+import { mapAppointmentToApiEvent } from "../proxy/mapper";
 
 export interface GetSingleCalendarEventParams {
     eventId: string;
@@ -24,7 +24,7 @@ export class GetSingleCalendarEventRequest {
             if (item == null)
                 return null;
 
-            return mapAppointmentToApiEvent(item);
+            return await mapAppointmentToApiEvent(item);
 
         } catch (e) {
             console.log(e.message, e.toString(), e.stack);

@@ -1,10 +1,10 @@
+import { AppointmentSchema, BasePropertySet, CalendarView, DateTime, ExchangeService, ExchangeVersion, FolderId, Mailbox, PropertyDefinitionBase, PropertySet, TimeZoneInfo, Uri, WellKnownFolderName } from "ews-javascript-api";
 import * as moment from 'moment-timezone';
-
+import { OfficeApiEvent } from '../model/office';
 import { Environment } from "../model/proxy";
-import { ExchangeService, Uri, FolderId, WellKnownFolderName, Mailbox, BasePropertySet, PropertySet, DateTime, CalendarView, AppointmentSchema, ExchangeVersion, TimeZoneInfo, PropertyDefinitionBase } from "ews-javascript-api";
 import { applyCredentials } from "../proxy/helper";
 import { mapAppointmentToApiEvent } from '../proxy/mapper';
-import { OfficeApiEvent } from '../model/office';
+
 
 export interface GetEventsParams {
     email: string;
@@ -66,10 +66,10 @@ export class GetEventsRequest {
                 if (!item) {
                     //@ts-ignore
                     if (ewsResult.Items[i] && ewsResult.Items[i].Sensitivity !== "Normal") {
-                        responseArray.push(mapAppointmentToApiEvent(ewsResult.Items[i]));
+                        responseArray.push(await mapAppointmentToApiEvent(ewsResult.Items[i]));
                     }
                 } else {
-                    responseArray.push(mapAppointmentToApiEvent(item));
+                    responseArray.push(await mapAppointmentToApiEvent(item));
                 }
             }
 
