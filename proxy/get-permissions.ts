@@ -1,10 +1,5 @@
+import { AttendeeInfo, AvailabilityData, BasePropertySet, DateTime, ExchangeService, ExchangeVersion, Folder, FolderId, FolderSchema, GetUserAvailabilityResults, Mailbox, PropertySet, ServiceResult, TimeWindow, TimeZoneInfo, Uri, WellKnownFolderName } from "ews-javascript-api";
 import { Environment } from "../model/proxy";
-import {
-    ExchangeService, Uri, ExchangeVersion, TimeZoneInfo,
-    AttendeeInfo, DateTime, TimeWindow, AvailabilityData,
-    ServiceResult, FolderId, WellKnownFolderName, Mailbox,
-    Folder, PropertySet, BasePropertySet, FolderSchema, GetUserAvailabilityResults
-} from "ews-javascript-api";
 import { applyCredentials, getAccessArrayFromEffectiveRights } from "../proxy/helper";
 
 
@@ -50,13 +45,7 @@ export class GetPermissionsRequest {
                         access: access
                     };
                 } //Else -> Fall back to free-busy, see below
-            } else {
-                //Fallback to old logic, not sure this is correct though
-                return {
-                    id: targetCalendar.Id.UniqueId,
-                    access: ['read']
-                };
-            }
+            } //Else -> Fall back to free-busy, see below
         }
 
         //We don't have full read access, check if we can get free busy data
