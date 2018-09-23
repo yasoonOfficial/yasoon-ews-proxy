@@ -17,18 +17,12 @@ export class GetSingleCalendarEventRequest {
         service.Url = new Uri(env.ewsUrl);
         applyCredentials(service, env);
 
-        try {
-            let propSet = new PropertySet(BasePropertySet.FirstClassProperties, AppointmentSchema.StartTimeZone, AppointmentSchema.EndTimeZone);
-            let item = await Appointment.Bind(service, new ItemId(eventId), propSet);
+        let propSet = new PropertySet(BasePropertySet.FirstClassProperties, AppointmentSchema.StartTimeZone, AppointmentSchema.EndTimeZone);
+        let item = await Appointment.Bind(service, new ItemId(eventId), propSet);
 
-            if (item == null)
-                return null;
-
-            return await mapAppointmentToApiEvent(item);
-
-        } catch (e) {
-            console.log(e.message, e.toString(), e.stack);
+        if (item == null)
             return null;
-        }
+
+        return await mapAppointmentToApiEvent(item);
     }
 }

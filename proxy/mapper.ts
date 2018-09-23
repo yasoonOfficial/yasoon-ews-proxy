@@ -162,50 +162,60 @@ export async function mapAppointmentToApiEvent(item: Appointment, additionalProp
             isMeeting: item.IsMeeting
         };
 
-        if (isSeriesItem(item)) {
-            let master = await Appointment.BindToRecurringMaster(item.Service, item.Id, new PropertySet(BasePropertySet.IdOnly));
-            if (master && master.Id)
-                result.seriesMasterId = master.Id.UniqueId;
-        }
-
-        if (item.GetLoadedPropertyDefinitions().find((p: PropertyDefinition) => p.Name === AppointmentSchema.WebClientReadFormQueryString.Name)) {
-            let webLink = '';
-            //According to https://msdn.microsoft.com/en-us/library/microsoft.exchange.webservices.data.item.webclientreadformquerystring(v=exchg.80).aspx
-            if (item.WebClientReadFormQueryString.indexOf('http') === 0) {
-                webLink = item.WebClientReadFormQueryString;
-            } else {
-                webLink = `${item.Service.Url.Scheme}://${item.Service.Url.Host}/owa/${item.WebClientReadFormQueryString}`;
+        try {
+            if (isSeriesItem(item)) {
+                let master = await Appointment.BindToRecurringMaster(item.Service, item.Id, new PropertySet(BasePropertySet.IdOnly));
+                if (master && master.Id)
+                    result.seriesMasterId = master.Id.UniqueId;
             }
-            result.webLink = webLink;
-        }
+        } catch (e) { }
 
-        if (hasProperty(item, AppointmentSchema.ParentFolderId)) {
-            result.calendarId = item.ParentFolderId.UniqueId;
-        }
-
-        if (hasProperty(item, AppointmentSchema.IsReminderSet)) {
-            result.isReminderOn = item.IsReminderSet;
-        }
-
-        if (hasProperty(item, AppointmentSchema.ReminderMinutesBeforeStart)) {
-            result.reminderMinutesBeforeStart = item.ReminderMinutesBeforeStart;
-        }
-
-        if (hasProperty(item, AppointmentSchema.Organizer)) {
-            result.organizer = ({
-                emailAddress: {
-                    name: item.Organizer.Name,
-                    address: item.Organizer.Address
+        doTry(() => {
+            if (item.GetLoadedPropertyDefinitions().find((p: PropertyDefinition) => p.Name === AppointmentSchema.WebClientReadFormQueryString.Name)) {
+                let webLink = '';
+                //According to https://msdn.microsoft.com/en-us/library/microsoft.exchange.webservices.data.item.webclientreadformquerystring(v=exchg.80).aspx
+                if (item.WebClientReadFormQueryString.indexOf('http') === 0) {
+                    webLink = item.WebClientReadFormQueryString;
+                } else {
+                    webLink = `${item.Service.Url.Scheme}://${item.Service.Url.Host}/owa/${item.WebClientReadFormQueryString}`;
                 }
-            });
-        }
+                result.webLink = webLink;
+            }
+        });
 
-        if (hasProperty(item, AppointmentSchema.Body)) {
-            result.body = ({
-                contentType: EnumValues.getNameFromValue(BodyType, item.Body.BodyType),
-                content: item.Body.Text
-            });
-        }
+        doTry(() => {
+            if (hasProperty(item, AppointmentSchema.ParentFolderId)) {
+                result.calendarId = item.ParentFolderId.UniqueId;
+            }
+
+            if (hasProperty(item, AppointmentSchema.IsReminderSet)) {
+                result.isReminderOn = item.IsReminderSet;
+            }
+
+            if (hasProperty(item, AppointmentSchema.ReminderMinutesBeforeStart)) {
+                result.reminderMinutesBeforeStart = item.ReminderMinutesBeforeStart;
+            }
+        });
+
+        doTry(() => {
+            if (hasProperty(item, AppointmentSchema.Organizer)) {
+                result.organizer = ({
+                    emailAddress: {
+                        name: item.Organizer.Name,
+                        address: item.Organizer.Address
+                    }
+                });
+            }
+        });
+
+        doTry(() => {
+            if (hasProperty(item, AppointmentSchema.Body)) {
+                result.body = ({
+                    contentType: EnumValues.getNameFromValue(BodyType, item.Body.BodyType),
+                    content: item.Body.Text
+                });
+            }
+        });
 
         if (item.RequiredAttendees.Count >= 1 || item.OptionalAttendees.Count >= 1 || item.Resources.Count >= 1) {
             let attendees = mapAttendees(item.RequiredAttendees, "Required");
@@ -214,9 +224,11 @@ export async function mapAppointmentToApiEvent(item: Appointment, additionalProp
             result.attendees = all;
         }
 
-        if (hasProperty(item, AppointmentSchema.Body) && item.Categories.Count > 0) {
-            result.categories = item.Categories.GetEnumerator();
-        }
+        doTry(() => {
+            if (hasProperty(item, AppointmentSchema.Body) && item.Categories.Count > 0) {
+                result.categories = item.Categories.GetEnumerator();
+            }
+        });
     }
 
     if (additionalProps && additionalProps.length > 0) {
@@ -233,6 +245,14 @@ export async function mapAppointmentToApiEvent(item: Appointment, additionalProp
     }
 
     return result;
+}
+
+export function doTry(func: () => any) {
+    try {
+        func();
+    } catch (e) {
+
+    }
 }
 
 export function getOfficeDateTime(date: DateTime, timezone: TimeZoneInfo, isAllDay: boolean): string {
@@ -271,17 +291,22 @@ export function isNullOrEmpty(s: string): boolean {
 }
 
 export function mapAttendees(attendees: AttendeeCollection, type: string) {
-    return attendees.GetEnumerator().map(a => ({
-        type: type,
-        status: {
-            response: getResponseStatusName(a.ResponseType),
-            time: a.LastResponseTime ? a.LastResponseTime.ToISOString() : null
-        },
-        emailAddress: {
-            name: a.Name,
-            address: a.Address
-        }
-    }));
+    try {
+        return attendees.GetEnumerator().map(a => ({
+            type: type,
+            status: {
+                response: getResponseStatusName(a.ResponseType),
+                time: a.LastResponseTime ? a.LastResponseTime.ToISOString() : null
+            },
+            emailAddress: {
+                name: a.Name,
+                address: a.Address
+            }
+        }));
+    }
+    catch (e) {
+        return [];
+    }
 }
 
 export function isSeriesItem(appointment: Appointment) {

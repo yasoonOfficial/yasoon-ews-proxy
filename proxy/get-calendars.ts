@@ -13,17 +13,11 @@ export class GetCalendarsRequest {
         let folderView = new FolderView(1000);
         folderView.PropertySet = new PropertySet(BasePropertySet.IdOnly, FolderSchema.DisplayName, FolderSchema.EffectiveRights);
 
-        try {
-            let ewsResult = await service.FindFolders(sharedCalendar, folderView);
-            return ewsResult.Folders.map(f => ({
-                id: f.Id.UniqueId,
-                name: f.DisplayName,
-                access: getAccessArrayFromEffectiveRights(f.EffectiveRights)
-            }));
-        }
-        catch (e) {
-            console.log(e.message, e.toString(), e.stack);
-            return [];
-        }
+        let ewsResult = await service.FindFolders(sharedCalendar, folderView);
+        return ewsResult.Folders.map(f => ({
+            id: f.Id.UniqueId,
+            name: f.DisplayName,
+            access: getAccessArrayFromEffectiveRights(f.EffectiveRights)
+        }));
     }
 }

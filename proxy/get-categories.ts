@@ -12,32 +12,25 @@ export class GetCategoriesRequest {
         applyCredentials(service, env);
 
         let calendar = new FolderId(WellKnownFolderName.Calendar, new Mailbox(params.email));
+        let categoryConfig = await service.GetUserConfiguration("CategoryList", calendar, UserConfigurationProperties.XmlData);
+        let rawXml = new Buffer(categoryConfig.XmlData, 'base64').toString();
 
-        try {
-            let categoryConfig = await service.GetUserConfiguration("CategoryList", calendar, UserConfigurationProperties.XmlData);
-            let rawXml = new Buffer(categoryConfig.XmlData, 'base64').toString();
-
-            let categoriesObject: XmlCategoriesResult = await new Promise<XmlCategoriesResult>((resolve, reject) => {
-                parseString(rawXml, (err, result) => {
-                    if (err)
-                        reject(err);
-                    else
-                        resolve(result);
-                });
+        let categoriesObject: XmlCategoriesResult = await new Promise<XmlCategoriesResult>((resolve, reject) => {
+            parseString(rawXml, (err, result) => {
+                if (err)
+                    reject(err);
+                else
+                    resolve(result);
             });
+        });
 
-            return categoriesObject.categories.category.map(c => ({
-                id: c.$.guid,
-                displayName: c.$.name,
-                color: 'preset' + c.$.color,
-                keyboardShortcut: c.$.keyboardShortcut,
-                lastTimeUsed: c.$.lastTimeUsedCalendar,
-                usageCount: c.$.usageCount
-            }));
-        }
-        catch (e) {
-            console.log(e.message, e.toString(), e.stack);
-            return [];
-        }
+        return categoriesObject.categories.category.map(c => ({
+            id: c.$.guid,
+            displayName: c.$.name,
+            color: 'preset' + c.$.color,
+            keyboardShortcut: c.$.keyboardShortcut,
+            lastTimeUsed: c.$.lastTimeUsedCalendar,
+            usageCount: c.$.usageCount
+        }));
     }
 }

@@ -10,28 +10,22 @@ export class SearchUserRequest {
         service.Url = new Uri(env.ewsUrl);
         applyCredentials(service, env);
 
-        try {
-            let resolutions = await service.ResolveName(params.searchTerm, ResolveNameSearchLocation.DirectoryOnly, true);
-            let results: OfficeUser[] = [];
+        let resolutions = await service.ResolveName(params.searchTerm, ResolveNameSearchLocation.DirectoryOnly, true);
+        let results: OfficeUser[] = [];
 
-            let it = resolutions.GetEnumerator();
-            it.map((result) => {
-                let officeUser: OfficeUser = {
-                    displayName: result.Contact.DisplayName,
-                    givenName: result.Contact.GivenName,
-                    id: result.Mailbox.Name,
-                    mail: result.Mailbox.Address,
-                    surname: result.Contact.Surname,
-                    personaType: result.Mailbox.MailboxType.toString()
-                }
-                results.push(officeUser);
-            });
+        let it = resolutions.GetEnumerator();
+        it.map((result) => {
+            let officeUser: OfficeUser = {
+                displayName: result.Contact.DisplayName,
+                givenName: result.Contact.GivenName,
+                id: result.Mailbox.Name,
+                mail: result.Mailbox.Address,
+                surname: result.Contact.Surname,
+                personaType: result.Mailbox.MailboxType.toString()
+            }
+            results.push(officeUser);
+        });
 
-            return results;
-
-        } catch (e) {
-            console.log(e.message, e.toString(), e.stack);
-            return [];
-        }
+        return results;
     }
 }

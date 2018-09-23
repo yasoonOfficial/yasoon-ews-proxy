@@ -10,34 +10,28 @@ export class CreateGroupRequest {
         service.Url = new Uri(env.ewsUrl);
         applyCredentials(service, env);
 
-        try {
-            //@ts-ignore
-            var request = new EwsCreateGroupRequest(service, null);
-            //@ts-ignore
-            request.Name = body.name;
-            //@ts-ignore
-            request.Alias = body.alias || body.name.replace(/\W/g, '');
-            //@ts-ignore
-            request.AccessType = body.accessType || "Public";
-            //@ts-ignore
-            request.Description = body.description || body.name;
-            //@ts-ignore
-            request.AutoSubscribeNewMembers = body.autoSubscribeNewMembers || false;
-            //@ts-ignore
-            let response = await request.Execute();
-            let group = response.GroupData;
+        //@ts-ignore
+        var request = new EwsCreateGroupRequest(service, null);
+        //@ts-ignore
+        request.Name = body.name;
+        //@ts-ignore
+        request.Alias = body.alias || body.name.replace(/\W/g, '');
+        //@ts-ignore
+        request.AccessType = body.accessType || "Public";
+        //@ts-ignore
+        request.Description = body.description || body.name;
+        //@ts-ignore
+        request.AutoSubscribeNewMembers = body.autoSubscribeNewMembers || false;
+        //@ts-ignore
+        let response = await request.Execute();
+        let group = response.GroupData;
 
-            return {
-                id: group.ExternalDirectoryObjectId,
-                name: group.DisplayName,
-                mailboxGuid: group.MailboxDatabase,
-                smtpAddress: group.GroupIdentity.Value,
-                visibility: group.AccessType
-            };
-
-        } catch (e) {
-            console.log(e.message, e.toString(), e.stack);
-            return [];
-        }
+        return {
+            id: group.ExternalDirectoryObjectId,
+            name: group.DisplayName,
+            mailboxGuid: group.MailboxDatabase,
+            smtpAddress: group.GroupIdentity.Value,
+            visibility: group.AccessType
+        };
     }
 }

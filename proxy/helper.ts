@@ -155,6 +155,8 @@ export function requestWrapper(func: (req: express.Request, res: express.Respons
         catch (e) {
             if (e instanceof SoapFaultDetails) {
                 res.status(e.HttpStatusCode).send(e.Message);
+            } else if (e.message) {
+                res.status(500).send(e.message);
             } else {
                 res.status(500).send();
             }

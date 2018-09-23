@@ -53,32 +53,35 @@ export class GetEventsRequest {
         additionalProperties.push(AppointmentSchema.IsMeeting);
         calendarView.PropertySet = new PropertySet(BasePropertySet.IdOnly, additionalProperties);
 
-        try {
-            let ewsResult = await service.FindAppointments(ewsFolder, calendarView);
-            if (ewsResult.Items.length === 0)
-                return [];
+        let ewsResult = await service.FindAppointments(ewsFolder, calendarView);
+        if (ewsResult.Items.length === 0)
+            return [];
 
-            let responseArray: OfficeApiEvent[] = [];
-            for (let i = 0; i < ewsResult.Items.length; i++) {
-                let item = ewsResult.Items[i];
+        let responseArray: OfficeApiEvent[] = [];
+        for (let i = 0; i < ewsResult.Items.length; i++) {
+            let item = ewsResult.Items[i];
 
-                //Might be private.. Check in ewsResult
-                if (!item) {
-                    //@ts-ignore
-                    if (ewsResult.Items[i] && ewsResult.Items[i].Sensitivity !== "Normal") {
+            //Might be private.. Check in ewsResult
+            if (!item) {
+                //@ts-ignore
+                if (ewsResult.Items[i] && ewsResult.Items[i].Sensitivity !== "Normal") {
+                    try {
                         responseArray.push(await mapAppointmentToApiEvent(ewsResult.Items[i]));
                     }
-                } else {
+                    catch (e) {
+
+                    }
+                }
+            } else {
+                try {
                     responseArray.push(await mapAppointmentToApiEvent(item));
                 }
-            }
+                catch (e) {
 
-            return responseArray;
+                }
+            }
         }
-        catch (e) {
-            console.log(e.message, e.toString(), e.stack);
-            return [];
-            //res.status(500).send({ key: 'retrieveCalendarsFailed', error: e.message });
-        }
+
+        return responseArray;
     }
 }
