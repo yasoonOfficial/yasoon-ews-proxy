@@ -11,21 +11,13 @@ export class SearchUserRequest {
         applyCredentials(service, env);
 
         let resolutions = await service.ResolveName(params.searchTerm, ResolveNameSearchLocation.DirectoryOnly, true);
-        let results: OfficeUser[] = [];
-
-        let it = resolutions.GetEnumerator();
-        it.map((result) => {
-            let officeUser: OfficeUser = {
-                displayName: result.Contact.DisplayName,
-                givenName: result.Contact.GivenName,
-                id: result.Mailbox.Name,
-                mail: result.Mailbox.Address,
-                surname: result.Contact.Surname,
-                personaType: result.Mailbox.MailboxType.toString()
-            }
-            results.push(officeUser);
-        });
-
-        return results;
+        return resolutions.GetEnumerator().map((result) => ({
+            displayName: result.Contact.DisplayName,
+            givenName: result.Contact.GivenName,
+            id: result.Mailbox.Name,
+            mail: result.Mailbox.Address,
+            surname: result.Contact.Surname,
+            personaType: result.Mailbox.MailboxType.toString()
+        }));
     }
 }
