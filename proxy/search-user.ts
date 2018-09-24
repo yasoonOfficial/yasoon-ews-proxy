@@ -1,7 +1,6 @@
 import { ExchangeService, Uri, ResolveNameSearchLocation } from "ews-javascript-api";
 import { applyCredentials } from '../proxy/helper';
 import { Environment } from '../model/proxy';
-import { OfficeUser } from '../model/office';
 
 export class SearchUserRequest {
 
