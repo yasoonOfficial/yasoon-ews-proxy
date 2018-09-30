@@ -5,6 +5,9 @@ import { EWS_AUTH_TYPE_HEADER, EWS_PASSWORD_HEADER, EWS_TOKEN_HEADER, EWS_URL_HE
 
 import * as express from 'express';
 
+import { createTableService, TableUtilities } from 'azure-storage';
+
+
 export function applyCredentials(service: any, env: Environment) {
     if (env.ewsToken) {
         service.Credentials = new OAuthCredentials(env.ewsToken);
@@ -41,13 +44,29 @@ export function getEnvFromHeader(req: express.Request, secret: string): Environm
         throw new Error('Invalid Secret');
     }
 
-    return {
+    let env = {
         ewsAuthType: req.headers[EWS_AUTH_TYPE_HEADER],
         ewsToken: req.headers[EWS_TOKEN_HEADER],
         ewsUrl: req.headers[EWS_URL_HEADER] || EWS_URL_OFFICE_365,
         ewsUser: req.headers[EWS_USER_HEADER],
-        ewsPassword: req.headers[EWS_PASSWORD_HEADER]
+        ewsPassword: req.headers[EWS_PASSWORD_HEADER],
+        tableService: undefined,
+        logId: new Date().getTime(),
+        logCount: 0
     };
+
+    if (process.env.LOGGING_CONNECTION_STRING) {
+        try {
+            env.tableService = createTableService(process.env.LOGGING_CONNECTION_STRING);
+        } catch (e) {
+        }
+    } else {
+        env.tableService = {
+            insertEntity: () => null
+        }
+    }
+
+    return env;
 }
 
 export function getAccessArrayFromEffectiveRights(effectiveRights: any) {
@@ -146,19 +165,51 @@ export function validateAutodiscoverRedirection(redirectionUrl: string) {
     return true;
 }
 
-export function requestWrapper(func: (req: express.Request, res: express.Response) => Promise<any>): (req: express.Request, res: express.Response) => void {
+export function requestWrapper(secret: string, func: (req: express.Request, res: express.Response, env: Environment) => Promise<any>): (req: express.Request, res: express.Response) => void {
     return (async (req: express.Request, res: express.Response) => {
+        let env = getEnvFromHeader(req, secret);
         try {
-            console.log("Processing ", req.path);
-            await func(req, res);
+            if (env.tableService) {
+                let gen = TableUtilities.entityGenerator;
+                env.tableService.insertEntity('ewsevents', {
+                    PartitionKey: gen.String(env.ewsUser || req.params.email),
+                    RowKey: gen.String(env.logId + "-" + env.logCount++),
+                    path: gen.String(req.path),
+                    key: gen.String('request-init'),
+                    ewsUrl: gen.String(env.ewsUrl),
+                    authType: gen.String(env.ewsAuthType)
+                }, function () {
+                });
+            }
+
+            await func(req, res, env);
         }
         catch (e) {
+            let message = '';
             if (e instanceof SoapFaultDetails) {
+                message = e.Message;
                 res.status(e.HttpStatusCode).send(e.Message);
             } else if (e.message) {
+                message = e.message;
                 res.status(500).send(e.message);
+            }
+            else if (typeof e === 'string') {
+                message = e;
+                res.status(500).send(e);
             } else {
                 res.status(500).send();
+            }
+
+            if (env.tableService) {
+                let gen = TableUtilities.entityGenerator;
+                env.tableService.insertEntity('ewsevents', {
+                    PartitionKey: gen.String(env.ewsUser),
+                    RowKey: gen.String(env.logId + "-" + env.logCount++),
+                    path: gen.String(req.path),
+                    key: gen.String('request-error'),
+                    error: gen.String(message),
+                    stack: gen.String(e.stack || "")
+                }, () => null);
             }
 
             //Valid response, don't log anything

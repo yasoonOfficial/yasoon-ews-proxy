@@ -4,6 +4,7 @@ import { ntlmAuthXhrApi } from "../extensions/CustomNtlmAuthXhrApi";
 import { Environment } from "../model/proxy";
 import { validateAutodiscoverRedirection } from "../proxy/helper";
 import { isNullOrEmpty } from './mapper';
+import { TableUtilities } from "azure-storage";
 
 export class GetAutodiscoverDataRequest {
 
@@ -50,8 +51,18 @@ export class GetAutodiscoverDataRequest {
         ];
 
         let errors = [];
+        let gen = TableUtilities.entityGenerator;
+
         for (const credential of credentials) {
             try {
+                //Logging...
+                env.tableService.insertEntity('ewsevents', {
+                    PartitionKey: gen.String(env.ewsUser),
+                    RowKey: gen.String(env.logId + "-" + env.logCount++),
+                    key: gen.String('autodiscover-ews-url'),
+                    data: gen.String(JSON.stringify({ authMode: credential.authMode, userNameRequired: credential.userNameRequired }))
+                }, () => null);
+
                 credential.apply(discoverService);
                 userSettings = await discoverService.GetUserSettings(
                     userEmail,
@@ -64,6 +75,14 @@ export class GetAutodiscoverDataRequest {
                 break;
             }
             catch (e) {
+                env.tableService.insertEntity('ewsevents', {
+                    PartitionKey: gen.String(env.ewsUser),
+                    RowKey: gen.String(env.logId + "-" + env.logCount++),
+                    key: gen.String('autodiscover-ews-url'),
+                    data: gen.String(JSON.stringify({ authMode: credential.authMode, userNameRequired: credential.userNameRequired })),
+                    error: gen.String(e.toString())
+                }, () => null);
+
                 errors.push(e.toString());
             }
         }
@@ -101,6 +120,13 @@ export class GetAutodiscoverDataRequest {
 
         for (const credential of credentials) {
             try {
+                env.tableService.insertEntity('ewsevents', {
+                    PartitionKey: gen.String(env.ewsUser),
+                    RowKey: gen.String(env.logId + "-" + env.logCount++),
+                    key: gen.String('autodiscover-resolve-user'),
+                    data: gen.String(JSON.stringify({ authMode: credential.authMode, userNameRequired: credential.userNameRequired }))
+                }, () => null);
+
                 credential.apply(exchangeService);
                 await exchangeService.ResolveName(params.email, ResolveNameSearchLocation.DirectoryOnly, true);
 
@@ -111,6 +137,14 @@ export class GetAutodiscoverDataRequest {
                 break;
             }
             catch (e) {
+                env.tableService.insertEntity('ewsevents', {
+                    PartitionKey: gen.String(env.ewsUser),
+                    RowKey: gen.String(env.logId + "-" + env.logCount++),
+                    key: gen.String('autodiscover-resolve-user'),
+                    data: gen.String(JSON.stringify({ authMode: credential.authMode, userNameRequired: credential.userNameRequired })),
+                    error: gen.String(e.toString())
+                }, () => null);
+
                 errors.push(e.toString());
             }
         }
@@ -139,6 +173,18 @@ export class GetAutodiscoverDataRequest {
         } else if (ewsSupportedSchemas.includes("2010")) {
             mode = "onpremise2010";
         }
+
+        env.tableService.insertEntity('ewsevents', {
+            PartitionKey: gen.String(env.ewsUser),
+            RowKey: gen.String(env.logId + "-" + env.logCount++),
+            key: gen.String('autodiscover-detected-settings'),
+            data: gen.String(JSON.stringify({
+                ewsUrl: ewsUrl,
+                mode: mode,
+                authMode: authMode,
+                ewsSupportedSchemas: ewsSupportedSchemas
+            }))
+        }, () => null);
 
         return { success: true, mode: mode, url: ewsUrl, authMode: authMode, externalMailboxServer: extHost, ewsSupportedSchemas: ewsSupportedSchemas, userNameRequired: userNameRequired };
     }

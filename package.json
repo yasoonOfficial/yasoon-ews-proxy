@@ -37,6 +37,7 @@
 		"@yasoon/ews-javascript-api-auth": "^1.2.1",
 		"autodiscover": "yasoonOfficial/node-autodiscover",
 		"aws-serverless-express": "^3.0.2",
+		"azure-storage": "^2.10.1",
 		"body-parser": "^1.15.2",
 		"cloudform": "^2.3.0",
 		"cpx": "^1.5.0",
