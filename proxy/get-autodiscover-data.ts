@@ -57,7 +57,7 @@ export class GetAutodiscoverDataRequest {
             try {
                 //Logging...
                 env.tableService.insertEntity('ewsevents', {
-                    PartitionKey: gen.String(env.ewsUser),
+                    PartitionKey: gen.String(userEmail),
                     RowKey: gen.String(env.logId + "-" + env.logCount++),
                     key: gen.String('autodiscover-ews-url'),
                     data: gen.String(JSON.stringify({ authMode: credential.authMode, userNameRequired: credential.userNameRequired }))
@@ -76,7 +76,7 @@ export class GetAutodiscoverDataRequest {
             }
             catch (e) {
                 env.tableService.insertEntity('ewsevents', {
-                    PartitionKey: gen.String(env.ewsUser),
+                    PartitionKey: gen.String(userEmail),
                     RowKey: gen.String(env.logId + "-" + env.logCount++),
                     key: gen.String('autodiscover-ews-url'),
                     data: gen.String(JSON.stringify({ authMode: credential.authMode, userNameRequired: credential.userNameRequired })),
@@ -121,7 +121,7 @@ export class GetAutodiscoverDataRequest {
         for (const credential of credentials) {
             try {
                 env.tableService.insertEntity('ewsevents', {
-                    PartitionKey: gen.String(env.ewsUser),
+                    PartitionKey: gen.String(userEmail),
                     RowKey: gen.String(env.logId + "-" + env.logCount++),
                     key: gen.String('autodiscover-resolve-user'),
                     data: gen.String(JSON.stringify({ authMode: credential.authMode, userNameRequired: credential.userNameRequired }))
@@ -138,7 +138,7 @@ export class GetAutodiscoverDataRequest {
             }
             catch (e) {
                 env.tableService.insertEntity('ewsevents', {
-                    PartitionKey: gen.String(env.ewsUser),
+                    PartitionKey: gen.String(userEmail),
                     RowKey: gen.String(env.logId + "-" + env.logCount++),
                     key: gen.String('autodiscover-resolve-user'),
                     data: gen.String(JSON.stringify({ authMode: credential.authMode, userNameRequired: credential.userNameRequired })),
@@ -175,7 +175,7 @@ export class GetAutodiscoverDataRequest {
         }
 
         env.tableService.insertEntity('ewsevents', {
-            PartitionKey: gen.String(env.ewsUser),
+            PartitionKey: gen.String(userEmail),
             RowKey: gen.String(env.logId + "-" + env.logCount++),
             key: gen.String('autodiscover-detected-settings'),
             data: gen.String(JSON.stringify({

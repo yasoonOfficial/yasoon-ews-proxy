@@ -172,7 +172,7 @@ export function requestWrapper(secret: string, func: (req: express.Request, res:
             if (env.tableService) {
                 let gen = TableUtilities.entityGenerator;
                 env.tableService.insertEntity('ewsevents', {
-                    PartitionKey: gen.String(env.ewsUser || req.params.email),
+                    PartitionKey: gen.String(env.ewsUser || req.params.email || "unknown"),
                     RowKey: gen.String(env.logId + "-" + env.logCount++),
                     path: gen.String(req.path),
                     key: gen.String('request-init'),
@@ -203,7 +203,7 @@ export function requestWrapper(secret: string, func: (req: express.Request, res:
             if (env.tableService) {
                 let gen = TableUtilities.entityGenerator;
                 env.tableService.insertEntity('ewsevents', {
-                    PartitionKey: gen.String(env.ewsUser),
+                    PartitionKey: gen.String(env.ewsUser || req.params.email || "unknown"),
                     RowKey: gen.String(env.logId + "-" + env.logCount++),
                     path: gen.String(req.path),
                     key: gen.String('request-error'),
