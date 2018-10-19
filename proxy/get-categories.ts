@@ -7,7 +7,7 @@ import { XmlCategoriesResult } from "../model/office";
 export class GetCategoriesRequest {
 
     async execute(env: Environment, params: { email: string }) {
-        let service = new ExchangeService(ExchangeVersion.Exchange2013);
+        let service = new ExchangeService(ExchangeVersion.Exchange2010);
         service.Url = new Uri(env.ewsUrl);
         applyCredentials(service, env);
 

@@ -1,11 +1,11 @@
-import { ExchangeService, Uri, ResolveNameSearchLocation } from "ews-javascript-api";
+import { ExchangeService, Uri, ResolveNameSearchLocation, ExchangeVersion } from "ews-javascript-api";
 import { applyCredentials } from '../proxy/helper';
 import { Environment } from '../model/proxy';
 
 export class SearchUserRequest {
 
     async execute(env: Environment, params: { searchTerm: string }) {
-        let service = new ExchangeService();
+        let service = new ExchangeService(ExchangeVersion.Exchange2010);
         service.Url = new Uri(env.ewsUrl);
         applyCredentials(service, env);
 

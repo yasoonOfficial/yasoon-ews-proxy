@@ -18,7 +18,7 @@ export interface UpdateUserCalendarEventParams {
 export class UpdateEventRequest {
 
     async execute(env: Environment, params: UpdateUserCalendarEventParams, payload: OfficeApiEvent) {
-        let service = new ExchangeService(ExchangeVersion.Exchange2013, TimeZoneInfo.Utc);
+        let service = new ExchangeService(ExchangeVersion.Exchange2010, TimeZoneInfo.Utc);
         service.Url = new Uri(env.ewsUrl);
         applyCredentials(service, env);
 

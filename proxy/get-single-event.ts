@@ -11,7 +11,7 @@ export interface GetSingleCalendarEventParams {
 export class GetSingleCalendarEventRequest {
 
     async execute(env: Environment, params: GetSingleCalendarEventParams) {
-        let service = new ExchangeService(ExchangeVersion.Exchange2013, TimeZoneInfo.Utc);
+        let service = new ExchangeService(ExchangeVersion.Exchange2010, TimeZoneInfo.Utc);
         let eventId = params.eventId;
 
         service.Url = new Uri(env.ewsUrl);

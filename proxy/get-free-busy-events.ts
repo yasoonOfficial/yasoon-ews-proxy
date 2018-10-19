@@ -19,7 +19,7 @@ export interface GetFreeBusyEventsParams {
 export class GetFreeBusyEventsRequest {
 
     async execute(env: Environment, params: GetFreeBusyEventsParams) {
-        let service = new ExchangeService(ExchangeVersion.Exchange2013, TimeZoneInfo.Utc);
+        let service = new ExchangeService(ExchangeVersion.Exchange2010, TimeZoneInfo.Utc);
         service.Url = new Uri(env.ewsUrl);
         applyCredentials(service, env);
 

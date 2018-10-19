@@ -1,5 +1,5 @@
 import { Environment } from "../model/proxy";
-import { ExchangeService, Uri, ResolveNameSearchLocation, NameResolution } from "ews-javascript-api";
+import { ExchangeService, Uri, ResolveNameSearchLocation, NameResolution, ExchangeVersion } from "ews-javascript-api";
 import { applyCredentials } from "../proxy/helper";
 import { OfficeUser } from '../model/office';
 
@@ -7,7 +7,7 @@ import { OfficeUser } from '../model/office';
 export class GetUserRequest {
 
     async execute(env: Environment, params: { email: string }) {
-        let service = new ExchangeService();
+        let service = new ExchangeService(ExchangeVersion.Exchange2010);
         service.Url = new Uri(env.ewsUrl);
         applyCredentials(service, env);
 

@@ -17,7 +17,7 @@ export interface GetEventsParams {
 export class GetEventsRequest {
 
     async execute(env: Environment, params: GetEventsParams) {
-        let service = new ExchangeService(ExchangeVersion.Exchange2013, TimeZoneInfo.Utc);
+        let service = new ExchangeService(ExchangeVersion.Exchange2010, TimeZoneInfo.Utc);
         service.Url = new Uri(env.ewsUrl);
         applyCredentials(service, env);
 

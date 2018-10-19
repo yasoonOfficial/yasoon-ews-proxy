@@ -16,7 +16,7 @@ export interface CreateEventParams {
 export class CreateEventRequest {
 
     async execute(env: Environment, params: CreateEventParams, payload: OfficeApiEvent) {
-        let service = new ExchangeService(ExchangeVersion.Exchange2013, TimeZoneInfo.Utc);
+        let service = new ExchangeService(ExchangeVersion.Exchange2010, TimeZoneInfo.Utc);
         service.Url = new Uri(env.ewsUrl);
         applyCredentials(service, env);
 

@@ -1,4 +1,4 @@
-import { AlternateId, ExchangeService, Folder, IdFormat, NameResolution, ResolveNameSearchLocation, Uri, WellKnownFolderName } from "ews-javascript-api";
+import { AlternateId, ExchangeService, Folder, IdFormat, NameResolution, ResolveNameSearchLocation, Uri, WellKnownFolderName, ExchangeVersion } from "ews-javascript-api";
 import { OfficeUser } from '../model/office';
 import { Environment } from "../model/proxy";
 import { applyCredentials } from "../proxy/helper";
@@ -7,7 +7,7 @@ import { applyCredentials } from "../proxy/helper";
 export class GetOwnUserRequest {
 
     async execute(env: Environment) {
-        let service = new ExchangeService();
+        let service = new ExchangeService(ExchangeVersion.Exchange2010);
         service.Url = new Uri(env.ewsUrl);
         applyCredentials(service, env);
 

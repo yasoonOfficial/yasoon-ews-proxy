@@ -1,12 +1,12 @@
 import { Environment } from "../model/proxy";
-import { ExchangeService, Uri } from "ews-javascript-api";
+import { ExchangeService, Uri, ExchangeVersion } from "ews-javascript-api";
 import { applyCredentials } from "../proxy/helper";
 import { GetUserPhotoRequest } from '../extensions/GetUserPhotoRequest';
 
 export class GetUserImageRequest {
 
     async execute(env: Environment, params: { email: string }) {
-        let service = new ExchangeService();
+        let service = new ExchangeService(ExchangeVersion.Exchange2013);
         service.Url = new Uri(env.ewsUrl);
         applyCredentials(service, env);
 

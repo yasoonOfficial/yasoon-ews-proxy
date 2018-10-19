@@ -16,7 +16,7 @@ export interface DeleteEventParams {
 export class DeleteEventRequest {
 
     async execute(env: Environment, params: DeleteEventParams) {
-        let service = new ExchangeService(ExchangeVersion.Exchange2013);
+        let service = new ExchangeService(ExchangeVersion.Exchange2010);
         service.Url = new Uri(env.ewsUrl);
         applyCredentials(service, env);
 

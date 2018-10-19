@@ -5,7 +5,7 @@ import { applyCredentials, getAccessArrayFromEffectiveRights } from "../proxy/he
 export class GetCalendarsRequest {
 
     async execute(env: Environment, params: { email: string }) {
-        let service = new ExchangeService(ExchangeVersion.Exchange2013);
+        let service = new ExchangeService(ExchangeVersion.Exchange2010);
         service.Url = new Uri(env.ewsUrl);
         applyCredentials(service, env);
 
@@ -14,13 +14,13 @@ export class GetCalendarsRequest {
         folderView.PropertySet = new PropertySet(BasePropertySet.IdOnly, FolderSchema.DisplayName, FolderSchema.EffectiveRights);
 
         try {
-        let ewsResult = await service.FindFolders(sharedCalendar, folderView);
-        return ewsResult.Folders.map(f => ({
-            id: f.Id.UniqueId,
-            name: f.DisplayName,
-            access: getAccessArrayFromEffectiveRights(f.EffectiveRights)
-        }));
-    }
+            let ewsResult = await service.FindFolders(sharedCalendar, folderView);
+            return ewsResult.Folders.map(f => ({
+                id: f.Id.UniqueId,
+                name: f.DisplayName,
+                access: getAccessArrayFromEffectiveRights(f.EffectiveRights)
+            }));
+        }
         catch (e) {
             console.log(e.message, e.toString(), e.stack);
             return [];

@@ -11,7 +11,7 @@ export interface GetPermissionsParams {
 export class GetPermissionsRequest {
 
     async execute(env: Environment, params: GetPermissionsParams) {
-        let service = new ExchangeService(ExchangeVersion.Exchange2013, TimeZoneInfo.Utc);
+        let service = new ExchangeService(ExchangeVersion.Exchange2010, TimeZoneInfo.Utc);
         service.Url = new Uri(env.ewsUrl);
         applyCredentials(service, env);
 
