@@ -5,8 +5,9 @@
 	"main": "./lib/index.js",
 	"typings": "./lib/index.d.ts",
 	"scripts": {
+		"clean": "rimraf dist",
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"build": "rimraf dist && tsc && xcopy .\\node_modules .\\dist\\node_modules /i /s /q /h /y /c && xcopy .\\app.js .\\dist\\app.js* && xcopy .\\version.json .\\dist\\version.json*",
+		"build": "yarn clean && tsc && yarn install --production --modules-folder .\\dist\\node_modules && xcopy .\\app.js .\\dist\\app.js* && xcopy .\\version.json .\\dist\\version.json*",
 		"pkg": "pkg .\\dist\\app.js --out-path dist",
 		"replaceIcon": ".\\res\\ResourceHacker.exe -open .\\dist\\app-win.exe -save .\\dist\\ews-proxy.exe -action addoverwrite -res .\\res\\logo.ico -mask ICONGROUP,1,1033",
 		"replaceManifest": ".\\res\\ResourceHacker.exe -open .\\res\\res.rc -action compile -save .\\res\\res.res && .\\res\\ResourceHacker.exe -open .\\dist\\ews-proxy.exe -resource .\\res\\res.res -action addoverwrite -save .\\dist\\ews-proxy.exe",
@@ -23,7 +24,7 @@
 		"url": "https://github.com/yasoonOfficial/yasoon-ews-proxy/issues"
 	},
 	"homepage": "https://github.com/yasoonOfficial/yasoon-ews-proxy/#readme",
-	"dependencies": {
+	"devDependencies": {
 		"@types/aws-lambda": "0.0.24",
 		"@types/aws-serverless-express": "^2.1.2",
 		"@types/express": "^4.0.39",
@@ -33,25 +34,27 @@
 		"@types/request": "^2.0.8",
 		"@types/request-promise": "^4.1.39",
 		"@types/xml2js": "^0.4.2",
+		"cloudform": "^2.3.0",
+		"cpx": "^1.5.0",
+		"pkg": "^4.3.0-beta.1",
+		"rimraf": "^2.6.2",
+		"typescript": "^3.1.3"
+	},
+	"dependencies": {
 		"@yasoon/dns-all-fetch": "^1.2.4",
 		"@yasoon/ews-javascript-api-auth": "^1.2.1",
 		"autodiscover": "yasoonOfficial/node-autodiscover",
 		"aws-serverless-express": "^3.0.2",
 		"azure-storage": "^2.10.1",
 		"body-parser": "^1.15.2",
-		"cloudform": "^2.3.0",
-		"cpx": "^1.5.0",
 		"enum-values": "^1.2.0",
 		"ews-javascript-api": "^0.9.2",
 		"express": "^4.16.2",
 		"moment": "^2.18.1",
 		"moment-timezone": "^0.5.13",
 		"ntlm-client": "yasoonOfficial/node-ntlm-client",
-		"pkg": "^4.3.0-beta.1",
 		"request": "^2.81.0",
 		"request-promise": "^4.2.0",
-		"rimraf": "^2.6.2",
-		"typescript": "^3.1.3",
 		"xml-escape": "^1.1.0",
 		"xml2js": "^0.4.19"
 	}
