@@ -3,6 +3,7 @@ import { Appointment, AppointmentSchema, AppointmentType, AttendeeCollection, Ba
 import * as moment from 'moment-timezone';
 import * as xmlEscape from 'xml-escape';
 import { EventAvailability, OfficeApiEvent, RecurrencePatternType, RecurrenceRangeType } from "../model/office";
+import { encodeUrlId } from "./helper";
 
 //import { raw } from 'body-parser';
 
@@ -125,7 +126,7 @@ export async function mapAppointmentToApiEvent(item: Appointment, additionalProp
     //@ts-ignore
     if (item.Sensitivity !== "Normal") {
         result = {
-            id: item.Id.UniqueId,
+            id: encodeUrlId(item.Id.UniqueId),
             start: {
                 dateTime: getOfficeDateTime(item.Start, item.StartTimeZone, item.IsAllDayEvent),
                 timeZone: 'UTC'
@@ -143,7 +144,7 @@ export async function mapAppointmentToApiEvent(item: Appointment, additionalProp
         };
     } else {
         result = {
-            id: item.Id.UniqueId,
+            id: encodeUrlId(item.Id.UniqueId),
             subject: item.Subject,
             start: {
                 dateTime: getOfficeDateTime(item.Start, item.StartTimeZone, item.IsAllDayEvent),
@@ -166,7 +167,7 @@ export async function mapAppointmentToApiEvent(item: Appointment, additionalProp
             if (isSeriesItem(item)) {
                 let master = await Appointment.BindToRecurringMaster(item.Service, item.Id, new PropertySet(BasePropertySet.IdOnly));
                 if (master && master.Id)
-                    result.seriesMasterId = master.Id.UniqueId;
+                    result.seriesMasterId = encodeUrlId(master.Id.UniqueId);
             }
         } catch (e) { }
 
@@ -185,7 +186,7 @@ export async function mapAppointmentToApiEvent(item: Appointment, additionalProp
 
         doTry(() => {
             if (hasProperty(item, AppointmentSchema.ParentFolderId)) {
-                result.calendarId = item.ParentFolderId.UniqueId;
+                result.calendarId = encodeUrlId(item.ParentFolderId.UniqueId);
             }
 
             if (hasProperty(item, AppointmentSchema.IsReminderSet)) {
