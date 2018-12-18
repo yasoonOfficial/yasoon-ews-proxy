@@ -39,6 +39,10 @@ export function decodeUrlId(id: string) {
     return id.replace(new RegExp("[-]", "g"), "/").replace(new RegExp("[_]", "g"), "+");
 }
 
+export function encodeUrlId(id: string) {
+    return id.replace(new RegExp("[/]", "g"), "-").replace(new RegExp("[+]", "g"), "_");
+}
+
 export function getEnvFromHeader(req: express.Request, secret: string): Environment {
     if (secret && req.headers[PROXY_SECRET_HEADER] !== secret) {
         throw new Error('Invalid Secret');
