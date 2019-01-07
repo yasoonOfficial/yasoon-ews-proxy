@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 var TimeZonePropertyDefinition_1 = require("ews-javascript-api/js/PropertyDefinitions/TimeZonePropertyDefinition");
 var TimeZoneDefinition_1 = require("ews-javascript-api/js/ComplexProperties/TimeZones/TimeZoneDefinition");
-var CreateItemRequestBase = require("ews-javascript-api/js/Core/Requests/CreateItemRequestBase");
+var CreateItemRequestBase_1 = require("ews-javascript-api/js/Core/Requests/CreateItemRequestBase");
 
 var Monkey = (function (_super) {
     function Monkey() {
@@ -26,7 +26,7 @@ var Monkey = (function (_super) {
             }
         };
 
-        CreateItemRequestBase.prototype.WriteAttributesToXml = function (writer) {
+        CreateItemRequestBase_1.CreateItemRequestBase.prototype.WriteAttributesToXml = function (writer) {
             _super.prototype.WriteAttributesToXml.call(this, writer);
             if (this.MessageDisposition !== null) {
                 writer.WriteAttributeValue(XmlAttributeNames_1.XmlAttributeNames.MessageDisposition, MessageDisposition_1.MessageDisposition[this.MessageDisposition]);
