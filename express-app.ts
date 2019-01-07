@@ -138,7 +138,8 @@ router.post('/user/:email/calendars/:id/events', requestWrapper(secret, async (r
     let createEvent = new CreateEventRequest();
     let result = await createEvent.execute(env, {
         calendarId: decodeUrlId(req.params.id),
-        email: req.params.email
+        email: req.params.email,
+        skipSendingInviteToGroup: req.query.skipSendingInviteToGroup
     }, req.body);
 
     res.send(result);
