@@ -9,6 +9,3 @@ Copy-Item -Path .\yarn.lock .\dist\
 
 cd .\dist
 yarn install --production
-
-cd ..
-node .\build\zip.js
