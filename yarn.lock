@@ -98,14 +98,14 @@
 
 "@yasoon/dns-all-fetch@^1.2.4":
   version "1.2.4"
-  resolved "https://registry.yasoon.org:443/@yasoon%2fdns-all-fetch/-/dns-all-fetch-1.2.4.tgz#7eb9fd81d03d75ff8b1b8e7b023ed707679efd16"
+  resolved "https://registry.npmjs.org/@yasoon/dns-all-fetch/-/dns-all-fetch-1.2.4.tgz#72b45c743f8e55a39af4e4f171ef79a059539efc"
   dependencies:
     biskviit "1.0.1"
     encoding "0.1.12"
 
-"@yasoon/ews-javascript-api-auth@^1.2.1":
+"@yasoon/ews-javascript-api-auth@^1.2.2":
   version "1.2.2"
-  resolved "https://registry.yasoon.org:443/@yasoon%2fews-javascript-api-auth/-/ews-javascript-api-auth-1.2.2.tgz#fa2843613104a2a9f93fcae1b146b4419eb280cf"
+  resolved "https://registry.npmjs.org/@yasoon/ews-javascript-api-auth/-/ews-javascript-api-auth-1.2.2.tgz#b6fad4deb93a6f72144f37f542738a6f5bb25128"
   dependencies:
     "@yasoon/dns-all-fetch" "^1.2.4"
     bluebird "^3.4.6"

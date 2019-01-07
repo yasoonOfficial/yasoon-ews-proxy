@@ -43,7 +43,7 @@
 	},
 	"dependencies": {
 		"@yasoon/dns-all-fetch": "^1.2.4",
-		"@yasoon/ews-javascript-api-auth": "^1.2.1",
+		"@yasoon/ews-javascript-api-auth": "^1.2.2",
 		"autodiscover": "yasoonOfficial/node-autodiscover",
 		"aws-serverless-express": "^3.0.2",
 		"azure-storage": "^2.10.1",
