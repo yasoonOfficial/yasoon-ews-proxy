@@ -11,6 +11,7 @@ import { OfficeApiEvent } from '../model/office';
 export interface CreateEventParams {
     email: string;
     calendarId: string;
+    skipSendingInviteToGroup: boolean;
 }
 
 export class CreateEventRequest {
@@ -37,6 +38,12 @@ export class CreateEventRequest {
         } else {
             targetFolderId = new FolderId();
             targetFolderId.UniqueId = params.calendarId;
+        }
+
+        // Hacky.. Move this to official channelcs somehow, maybe we need to fork ews-javascript-api after all?
+        if (params.skipSendingInviteToGroup === true) {
+            //@ts-ignore
+            service.SkipSendingMeetingInviteToGroup = true;
         }
 
         let appointment = new Appointment(service);
