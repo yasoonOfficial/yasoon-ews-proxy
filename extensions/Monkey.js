@@ -4,6 +4,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var TimeZonePropertyDefinition_1 = require("ews-javascript-api/js/PropertyDefinitions/TimeZonePropertyDefinition");
 var TimeZoneDefinition_1 = require("ews-javascript-api/js/ComplexProperties/TimeZones/TimeZoneDefinition");
 var CreateItemRequestBase_1 = require("ews-javascript-api/js/Core/Requests/CreateItemRequestBase");
+var CreateRequest_1 = require("ews-javascript-api/js/Core/Requests/CreateRequest");
+var XmlAttributeNames_1 = require("ews-javascript-api/js/Core/XmlAttributeNames");
+var MessageDisposition_1 = require("ews-javascript-api/js/Enumerations/MessageDisposition");
+var SendInvitationsMode_1 = require("ews-javascript-api/js/Enumerations/SendInvitationsMode");
 
 var Monkey = (function (_super) {
     function Monkey() {
@@ -27,7 +31,7 @@ var Monkey = (function (_super) {
         };
 
         CreateItemRequestBase_1.CreateItemRequestBase.prototype.WriteAttributesToXml = function (writer) {
-            _super.prototype.WriteAttributesToXml.call(this, writer);
+            CreateRequest_1.CreateRequest.prototype.WriteAttributesToXml.call(this, writer);
             if (this.MessageDisposition !== null) {
                 writer.WriteAttributeValue(XmlAttributeNames_1.XmlAttributeNames.MessageDisposition, MessageDisposition_1.MessageDisposition[this.MessageDisposition]);
             }
