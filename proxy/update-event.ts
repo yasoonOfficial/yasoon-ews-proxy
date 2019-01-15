@@ -5,7 +5,7 @@ import {
     SendInvitationsOrCancellationsMode, ConflictResolutionMode
 } from "ews-javascript-api";
 import { applyCredentials } from "../proxy/helper";
-import { copyApiEventToAppointment } from '../proxy/mapper';
+import { copyApiEventToAppointment, mapAppointmentToApiEvent } from '../proxy/mapper';
 import { OfficeApiEvent } from '../model/office';
 
 export interface UpdateUserCalendarEventParams {
@@ -43,5 +43,6 @@ export class UpdateEventRequest {
         }
 
         await appointment.Update(ConflictResolutionMode.AutoResolve, mode);
+        return mapAppointmentToApiEvent(appointment);
     }
 }

@@ -147,14 +147,14 @@ router.post('/user/:email/calendars/:id/events', requestWrapper(secret, async (r
 
 router.patch('/user/:email/calendars/:id/events/:eventId', requestWrapper(secret, async (req: express.Request, res: express.Response, env: Environment) => {
     let updateEvent = new UpdateEventRequest();
-    await updateEvent.execute(env, {
+    let result = await updateEvent.execute(env, {
         calendarId: decodeUrlId(req.params.id),
         email: req.params.email,
         eventId: decodeUrlId(req.params.eventId),
         entireSeries: req.query.entireSeries === 'true'
     }, req.body);
 
-    res.status(200).send({});
+    res.send(result);
 }));
 
 router.post('/user/:email/calendars/:id/events/:eventId/delete', requestWrapper(secret, async (req: express.Request, res: express.Response, env: Environment) => {
