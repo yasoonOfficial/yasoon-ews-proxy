@@ -154,7 +154,7 @@ export async function mapAppointmentToApiEvent(item: Appointment, additionalProp
                 dateTime: getOfficeDateTime(item.End, item.StartTimeZone, item.IsAllDayEvent),
                 timeZone: 'UTC'
             },
-            location: { displayName: item.Location },
+            location: { displayName: item.Location || '' },
             isAllDay: item.IsAllDayEvent,
             //@ts-ignore
             showAs: getFreeBusyStatusNewName(LegacyFreeBusyStatus[item.LegacyFreeBusyStatus]),
