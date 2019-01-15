@@ -50,6 +50,6 @@ export class CreateEventRequest {
         copyApiEventToAppointment(rawEvent, appointment);
 
         await appointment.Save(targetFolderId, mode);
-        return mapAppointmentToApiEvent(appointment);
+        return await mapAppointmentToApiEvent(appointment);
     }
 }
