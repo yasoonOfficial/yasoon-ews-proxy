@@ -5,8 +5,9 @@ import {
     SendInvitationsMode
 } from "ews-javascript-api";
 import { applyCredentials } from "../proxy/helper";
-import { copyApiEventToAppointment, mapAppointmentToApiEvent } from '../proxy/mapper';
+import { copyApiEventToAppointment } from '../proxy/mapper';
 import { OfficeApiEvent } from '../model/office';
+import { GetSingleCalendarEventRequest } from "./get-single-event";
 
 export interface CreateEventParams {
     email: string;
@@ -50,6 +51,8 @@ export class CreateEventRequest {
         copyApiEventToAppointment(rawEvent, appointment);
 
         await appointment.Save(targetFolderId, mode);
-        return mapAppointmentToApiEvent(appointment);
+
+        let eventReq = new GetSingleCalendarEventRequest();
+        return await eventReq.execute(env, { eventId: appointment.Id.UniqueId });
     }
 }
