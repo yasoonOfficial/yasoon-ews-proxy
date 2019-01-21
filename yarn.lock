@@ -115,9 +115,9 @@
     biskviit "1.0.1"
     encoding "0.1.12"
 
-"@yasoon/ews-javascript-api-auth@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/@yasoon/ews-javascript-api-auth/-/ews-javascript-api-auth-1.2.2.tgz#b6fad4deb93a6f72144f37f542738a6f5bb25128"
+"@yasoon/ews-javascript-api-auth@^1.2.3":
+  version "1.2.3"
+  resolved "https://registry.npmjs.org/@yasoon/ews-javascript-api-auth/-/ews-javascript-api-auth-1.2.3.tgz#d44068284d800079a63047c259c3252a2cd11820"
   dependencies:
     "@yasoon/dns-all-fetch" "^1.2.4"
     bluebird "^3.4.6"
