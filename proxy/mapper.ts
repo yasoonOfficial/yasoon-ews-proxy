@@ -2,7 +2,7 @@ import { EnumValues } from "enum-values/src/enumValues";
 import { Appointment, AppointmentSchema, AppointmentType, AttendeeCollection, BasePropertySet, BodyType, DateTime, DateTimeKind, DayOfTheWeek, DayOfTheWeekIndex, ExtendedPropertyDefinition, IOutParam, LegacyFreeBusyStatus, MeetingResponseType, MessageBody, PropertyDefinition, PropertyDefinitionBase, PropertySet, Recurrence, StringList, TimeZoneInfo } from "ews-javascript-api";
 import * as moment from 'moment-timezone';
 import * as xmlEscape from 'xml-escape';
-import { EventAvailability, OfficeApiEvent, RecurrencePatternType, RecurrenceRangeType } from "../model/office";
+import { EventAvailability, OfficeApiEvent, RecurrencePatternType, RecurrenceRangeType, EventSensitivity } from "../model/office";
 import { encodeUrlId } from "./helper";
 
 //import { raw } from 'body-parser';
@@ -137,8 +137,8 @@ export async function mapAppointmentToApiEvent(item: Appointment, additionalProp
             },
             type: 'singleInstance',
             isAllDay: item.IsAllDayEvent,
-            sensitivity: <any>item.Sensitivity,
-            subject: <any>item.Sensitivity,
+            sensitivity: getSensitivity(<any>item.Sensitivity),
+            subject: item.Subject ? item.Subject : <any>item.Sensitivity,
             //@ts-ignore
             showAs: getFreeBusyStatusNewName(LegacyFreeBusyStatus[item.LegacyFreeBusyStatus])
         };
@@ -159,7 +159,7 @@ export async function mapAppointmentToApiEvent(item: Appointment, additionalProp
             //@ts-ignore
             showAs: getFreeBusyStatusNewName(LegacyFreeBusyStatus[item.LegacyFreeBusyStatus]),
             type: getAppointmentType(<any>item.AppointmentType),
-            sensitivity: <any>item.Sensitivity,
+            sensitivity: getSensitivity(<any>item.Sensitivity),
             isMeeting: item.IsMeeting
         };
 
@@ -400,5 +400,21 @@ export function getFreeBusyStatusNewName(status: LegacyFreeBusyStatus): EventAva
             return <EventAvailability>'tentative';
         case LegacyFreeBusyStatus.WorkingElsewhere:
             return <EventAvailability>'workingElsewhere';
+    }
+}
+
+export function getSensitivity(sensitivity: string): EventSensitivity {
+    if (sensitivity === null)
+        return null;
+
+    switch (sensitivity) {
+        case "Normal":
+            return EventSensitivity.Normal
+        case "Private":
+            return EventSensitivity.Private
+        case "Personal":
+            return EventSensitivity.Personal
+        case "Confidential":
+            return EventSensitivity.Confidential
     }
 }

@@ -10,7 +10,7 @@ export interface OfficeApiEvent {
     };
     isReminderOn?: boolean;
     reminderMinutesBeforeStart?: number;
-    sensitivity?: string;
+    sensitivity?: EventSensitivity;
     end?: {
         dateTime: string;
         timeZone: string;
@@ -101,6 +101,10 @@ export interface OfficeSharedMailbox {
 
 export enum EventAvailability {
     Busy = "busy", Free = "free", NoData = "unknown", Tentative = "tentative", OutOfOffice = "oof", WorkingElsewhere = "workingElsewhere"
+}
+
+export enum EventSensitivity {
+    Normal = "normal", Private = "private", Personal = "personal", Confidential = "confidential"
 }
 
 export interface PatternedRecurrence {
