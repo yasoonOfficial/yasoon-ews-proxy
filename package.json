@@ -16,8 +16,7 @@
 		"replaceManifest": ".\\res\\ResourceHacker.exe -open .\\res\\res.rc -action compile -save .\\res\\res.res && .\\res\\ResourceHacker.exe -open .\\dist\\ews-proxy.exe -resource .\\res\\res.res -action addoverwrite -save .\\dist\\ews-proxy.exe",
 		"sign": ".\\res\\signtool sign /a /fd SHA256 /tr \"http://timestamp.globalsign.com/?signature=sha2\" /td SHA256 .\\dist\\ews-proxy.exe",
 		"prepublishOnly": "rimraf lib && tsc -d --outDir lib --allowJs false --lib ES2015,DOM index.ts && cpx ./extensions/**/* ./lib/extensions",
-		"prepare": "npm run build",
-		"preinstall": "npx npm-force-resolutions"
+		"prepare": "npm run build"
 	},
 	"publishConfig": {
 		"registry": "https://npm.pkg.github.com/"
@@ -59,14 +58,10 @@
 		"express": "^4.16.2",
 		"moment": "^2.18.1",
 		"moment-timezone": "^0.5.13",
-		"npm-force-resolutions": "0.0.3",
 		"ntlm-client": "yasoonOfficial/node-ntlm-client",
+		"request": "^2.88.2",
 		"xml-escape": "^1.1.0",
 		"xml2js": "^0.4.19"
-	},
-	"resolutions": {
-		"validator": "^3.22.1",
-		"request": "^2.68.0"
 	},
 	"engines": {
 		"yarn": "NO LONGER USED - Please use npm",
