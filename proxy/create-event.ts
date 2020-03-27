@@ -37,8 +37,7 @@ export class CreateEventRequest {
         if (params.calendarId === 'main') {
             targetFolderId = new FolderId(WellKnownFolderName.Calendar, new Mailbox(params.email));
         } else {
-            targetFolderId = new FolderId();
-            targetFolderId.UniqueId = params.calendarId;
+            targetFolderId = new FolderId(params.calendarId);
         }
 
         // Hacky.. Move this to official channelcs somehow, maybe we need to fork ews-javascript-api after all?

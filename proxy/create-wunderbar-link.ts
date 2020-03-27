@@ -72,12 +72,12 @@ export class CreateWunderbarLinkRequest {
         let ownStoreId = calculateStoreId(ownUserSettings.Settings[UserSettingName.UserDN], ownUserSettings.Settings[UserSettingName.InternalRpcClientServer]);
         let targetStoreId = calculateStoreId(targetMailBoxSettings.Settings[UserSettingName.UserDN], targetMailBoxSettings.Settings[UserSettingName.InternalRpcClientServer]);
         //let abTargetABEntryId = calculateAddressBookId(targetMailBoxSettings.Settings[UserSettingName.UserDN]);
-        let sharedCalFolderId = new FolderId();
+        let sharedCalFolderId: FolderId;
 
         if (targetMailboxFolderId === 'main') {
             sharedCalFolderId = new FolderId(WellKnownFolderName.Calendar, new Mailbox(targetMailboxEmail));
         } else {
-            sharedCalFolderId.UniqueId = targetMailboxFolderId;
+            sharedCalFolderId = new FolderId(targetMailboxFolderId);
         }
 
         let sharedCal = await CalendarFolder.Bind(service, sharedCalFolderId, new PropertySet(BasePropertySet.FirstClassProperties, [pidTagEntryId]));

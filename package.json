@@ -1,22 +1,30 @@
 {
-	"name": "@yasoon/ews-proxy",
-	"version": "1.4.0",
+	"name": "@yasoonofficial/ews-proxy",
+	"version": "1.4.1",
 	"description": "",
 	"main": "./lib/index.js",
 	"typings": "./lib/index.d.ts",
+	"files": [
+		"dist/**/*"
+	],
 	"scripts": {
 		"clean": "rimraf dist",
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"build": "yarn clean && tsc && yarn install --production --modules-folder .\\dist\\node_modules && xcopy .\\app.js .\\dist\\app.js* && xcopy .\\version.json .\\dist\\version.json*",
+		"build": "npm run clean && tsc && npm install --production && xcopy /E .\\node_modules .\\dist\\node_modules\\ > nul && xcopy .\\app.js .\\dist\\app.js* && xcopy .\\version.json .\\dist\\version.json*",
 		"pkg": "pkg .\\dist\\app.js --out-path dist",
 		"replaceIcon": ".\\res\\ResourceHacker.exe -open .\\dist\\app-win.exe -save .\\dist\\ews-proxy.exe -action addoverwrite -res .\\res\\logo.ico -mask ICONGROUP,1,1033",
 		"replaceManifest": ".\\res\\ResourceHacker.exe -open .\\res\\res.rc -action compile -save .\\res\\res.res && .\\res\\ResourceHacker.exe -open .\\dist\\ews-proxy.exe -resource .\\res\\res.res -action addoverwrite -save .\\dist\\ews-proxy.exe",
 		"sign": ".\\res\\signtool sign /a /fd SHA256 /tr \"http://timestamp.globalsign.com/?signature=sha2\" /td SHA256 .\\dist\\ews-proxy.exe",
-		"prepublishOnly": "rimraf lib && tsc -d --outDir lib --allowJs false --lib ES2015,DOM index.ts && cpx ./extensions/**/* ./lib/extensions"
+		"prepublishOnly": "rimraf lib && tsc -d --outDir lib --allowJs false --lib ES2015,DOM index.ts && cpx ./extensions/**/* ./lib/extensions",
+		"preinstall": "npx npm-force-resolutions"
+	},
+	"publishConfig": {
+		"registry": "https://npm.pkg.github.com/"
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/yasoonOfficial/yasoon-ews-proxy.git"
+		"url": "git://github.com/yasoonOfficial/yasoon-ews-proxy.git",
+		"directory": "packages/yasoon-ews-proxy"
 	},
 	"author": "",
 	"license": "MIT",
@@ -50,8 +58,17 @@
 		"express": "^4.16.2",
 		"moment": "^2.18.1",
 		"moment-timezone": "^0.5.13",
+		"npm-force-resolutions": "0.0.3",
 		"ntlm-client": "yasoonOfficial/node-ntlm-client",
 		"xml-escape": "^1.1.0",
 		"xml2js": "^0.4.19"
+	},
+	"resolutions": {
+		"validator": "^3.22.1",
+		"request": "^2.68.0"
+	},
+	"engines": {
+		"yarn": "NO LONGER USED - Please use npm",
+		"npm": "^6.0.0"
 	}
 }

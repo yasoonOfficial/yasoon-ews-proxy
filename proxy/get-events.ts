@@ -30,8 +30,7 @@ export class GetEventsRequest {
         if (calendarId === 'main') {
             ewsFolder = new FolderId(WellKnownFolderName.Calendar, new Mailbox(userEmail));
         } else {
-            ewsFolder = new FolderId();
-            ewsFolder.UniqueId = calendarId;
+            ewsFolder = new FolderId(calendarId);
         }
 
         let calendarView = new CalendarView(start, end);

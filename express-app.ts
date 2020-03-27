@@ -65,13 +65,13 @@ router.post('/logging', (req: express.Request, res: express.Response) => {
 
 router.get('/autodiscover/:email', requestWrapper(secret, async (req: express.Request, res: express.Response, env: Environment) => {
     let getAutodiscover = new GetAutodiscoverDataRequest();
-    let result = await getAutodiscover.execute(env, req.params);
+    let result = await getAutodiscover.execute(env, req.params as { email: string });
     res.send(result);
 }));
 
 router.get('/user/:email/publicFolderMailbox', requestWrapper(secret, async (req: express.Request, res: express.Response, env: Environment) => {
     let getPublicFolder = new GetPublicFolderMailboxRequest();
-    let result = await getPublicFolder.execute(env, req.params);
+    let result = await getPublicFolder.execute(env, req.params as { email: string });
     res.send(result);
 }));
 
@@ -89,13 +89,13 @@ router.get('/user/me', requestWrapper(secret, async (req: express.Request, res: 
 
 router.get('/user/:email', requestWrapper(secret, async (req: express.Request, res: express.Response, env: Environment) => {
     let getUser = new GetUserRequest();
-    let result = await getUser.execute(env, req.params);
+    let result = await getUser.execute(env, req.params as { email: string });
     res.send(result);
 }));
 
 router.get('/user/:email/photo', requestWrapper(secret, async (req: express.Request, res: express.Response, env: Environment) => {
     let getUserImage = new GetUserImageRequest();
-    let result = await getUserImage.execute(env, req.params);
+    let result = await getUserImage.execute(env, req.params as { email: string });
 
     res.set('Content-Type', result.mimeType);
     res.send(result.content);
@@ -103,13 +103,13 @@ router.get('/user/:email/photo', requestWrapper(secret, async (req: express.Requ
 
 router.get('/user/:email/calendars', requestWrapper(secret, async (req: express.Request, res: express.Response, env: Environment) => {
     let getUserCalendar = new GetCalendarsRequest();
-    let result = await getUserCalendar.execute(env, req.params);
+    let result = await getUserCalendar.execute(env, req.params as { email: string });
     res.send(result);
 }));
 
 router.get('/user/:email/categories', requestWrapper(secret, async (req: express.Request, res: express.Response, env: Environment) => {
     let getCategories = new GetCategoriesRequest();
-    let result = await getCategories.execute(env, req.params);
+    let result = await getCategories.execute(env, req.params as { email: string });
     res.send(result);
 }));
 
@@ -196,7 +196,7 @@ router.get('/user/:email/calendars/:id/effective-permissions', requestWrapper(se
 
 router.post('/user/:email/calendars', requestWrapper(secret, async (req: express.Request, res: express.Response, env: Environment) => {
     let createCalendar = new CreateCalendarRequest();
-    let result = await createCalendar.execute(env, req.params, req.body);
+    let result = await createCalendar.execute(env, req.params as { email: string }, req.body);
     res.send(result);
 }));
 
@@ -211,7 +211,7 @@ router.delete('/user/:email/calendars/:id/delete', requestWrapper(secret, async 
 
 router.post('/user/:email/create-wunderbar-link', requestWrapper(secret, async (req: express.Request, res: express.Response, env: Environment) => {
     let createWunderlink = new CreateWunderbarLinkRequest();
-    await createWunderlink.execute(env, req.params, req.body);
+    await createWunderlink.execute(env, req.params as { email: string }, req.body);
 
     res.send({
         success: true
