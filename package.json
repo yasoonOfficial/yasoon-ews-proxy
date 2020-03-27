@@ -1,6 +1,6 @@
 {
 	"name": "@yasoonofficial/ews-proxy",
-	"version": "1.4.1",
+	"version": "1.5.0",
 	"description": "",
 	"main": "./lib/index.js",
 	"typings": "./lib/index.d.ts",
@@ -16,6 +16,7 @@
 		"replaceManifest": ".\\res\\ResourceHacker.exe -open .\\res\\res.rc -action compile -save .\\res\\res.res && .\\res\\ResourceHacker.exe -open .\\dist\\ews-proxy.exe -resource .\\res\\res.res -action addoverwrite -save .\\dist\\ews-proxy.exe",
 		"sign": ".\\res\\signtool sign /a /fd SHA256 /tr \"http://timestamp.globalsign.com/?signature=sha2\" /td SHA256 .\\dist\\ews-proxy.exe",
 		"prepublishOnly": "rimraf lib && tsc -d --outDir lib --allowJs false --lib ES2015,DOM index.ts && cpx ./extensions/**/* ./lib/extensions",
+		"prepare": "npm run build",
 		"preinstall": "npx npm-force-resolutions"
 	},
 	"publishConfig": {
