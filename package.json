@@ -57,7 +57,7 @@
 		"ews-javascript-api": "^0.9.2",
 		"express": "^4.16.2",
 		"moment": "^2.18.1",
-		"moment-timezone": "^0.5.13",
+		"moment-timezone": "^0.5.35",
 		"ntlm-client": "yasoonOfficial/node-ntlm-client",
 		"request": "^2.88.2",
 		"xml-escape": "^1.1.0",
